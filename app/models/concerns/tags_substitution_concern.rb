@@ -69,7 +69,7 @@ module TagsSubstitutionConcern
         if d.justificatif_motivation.attached?
           external_link(url_for_justificatif_motivation(d), "Télécharger le document justificatif")
         else
-          return "[l'instructeur n'a pas joint de document supplémentaire]"
+          return "[l’instructeur n’a pas joint de document supplémentaire]"
         end
       },
       available_for_states: Dossier::TERMINE
@@ -85,13 +85,13 @@ module TagsSubstitutionConcern
     },
     {
       libelle: 'nom',
-      description: "nom de l'usager",
+      description: "nom de l’usager",
       target: :nom,
       available_for_states: Dossier::SOUMIS
     },
     {
       libelle: 'prénom',
-      description: "prénom de l'usager",
+      description: "prénom de l’usager",
       target: :prenom,
       available_for_states: Dossier::SOUMIS
     }
@@ -111,7 +111,7 @@ module TagsSubstitutionConcern
       available_for_states: Dossier::SOUMIS
     },
     {
-      libelle: 'SIRET du siège social',
+      libelle: 'Numéro TAHITI du siège social',
       description: '',
       target: :siret_siege_social,
       available_for_states: Dossier::SOUMIS
@@ -152,6 +152,13 @@ module TagsSubstitutionConcern
     end
 
     filter_tags(identity_tags + dossier_tags + champ_public_tags + champ_private_tags + routage_tags)
+  end
+
+  def unspecified_champs_for_dossier(dossier)
+    tags = used_tags
+    (dossier.champs + dossier.champs_private).filter do |champ|
+      tags.include?(champ.libelle) && champ.value.blank? && champ.champs.empty? && !champ.piece_justificative_file.attached?
+    end
   end
 
   private
@@ -255,5 +262,16 @@ module TagsSubstitutionConcern
     end
 
     text.gsub(/--#{libelle}--/, value.to_s)
+  end
+
+  def used_tags
+    delimiters_regex = /--(?<capture>((?!--).)*)--/
+
+    # We can't use flat_map as scan will return 3 levels of array,
+    # using flat_map would give us 2, whereas flatten will
+    # give us 1, which is what we want
+    [subject, body]
+      .compact.map { |str| str.scan(delimiters_regex) }
+      .flatten.to_set
   end
 end

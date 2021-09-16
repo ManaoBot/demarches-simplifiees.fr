@@ -8,11 +8,13 @@ gem 'active_storage_validations'
 gem 'administrate'
 gem 'after_party'
 gem 'anchored'
+gem 'aws-sdk-s3'
 gem 'bcrypt'
 gem 'browser'
 gem 'chartkick'
 gem 'chunky_png'
 gem 'clamav-client', require: 'clamav/client'
+gem 'concurrent-ruby'
 gem 'daemons'
 gem 'deep_cloneable' # Enable deep clone of active record models
 gem 'delayed_cron_job' # Cron jobs
@@ -52,8 +54,11 @@ gem 'mailjet'
 gem 'openid_connect'
 gem 'pg'
 gem 'phonelib'
+gem 'prawn' # PDF Generation
+gem 'prawn-qrcode' # to generate qrcode in pdfs
 gem 'prawn-rails' # PDF Generation
 gem 'prawn-svg'
+gem 'prawn-table'
 gem 'premailer-rails'
 gem 'puma' # Use Puma as the app server
 gem 'pundit'
@@ -122,7 +127,7 @@ group :development, :test do
   gem 'pry-byebug' # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'rspec_junit_formatter', require: false
   gem 'rspec-rails'
-  gem 'ruby-debug-ide', require: false
+  gem 'ruby-debug-ide', '~> 0.7.2', require: false
   gem 'simple_xlsx_reader'
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-commands-rspec'

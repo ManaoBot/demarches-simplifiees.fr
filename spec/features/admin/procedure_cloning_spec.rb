@@ -10,7 +10,7 @@ feature 'As an administrateur I wanna clone a procedure', js: true do
       aasm_state: :publiee,
       administrateurs: [administrateur],
       libelle: 'libellé de la procédure',
-      path: 'libelle-de-la-procedure')
+      path: 'service-libelle-de-la-procedure')
     login_as administrateur.user, scope: :user
   end
 
@@ -26,7 +26,7 @@ feature 'As an administrateur I wanna clone a procedure', js: true do
       expect(page).to have_current_path(admin_procedure_path(Procedure.last))
 
       find('#publish-procedure-link').click
-      expect(find_field('procedure_path').value).to eq 'libelle-de-la-procedure'
+      expect(find_field('procedure_path').value).to eq 'service-libelle-de-la-procedure'
       fill_in 'lien_site_web', with: 'http://some.website'
       click_on 'publish'
 

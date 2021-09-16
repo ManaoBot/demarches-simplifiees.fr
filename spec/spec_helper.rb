@@ -29,7 +29,10 @@ require 'factory_bot'
 require 'axe/rspec'
 
 require 'selenium/webdriver'
-Capybara.javascript_driver = :headless_chrome
+
+TEST_PASSWORD = 'PARAU TAHITI ‘OE'
+
+Capybara.javascript_driver      = ENV.fetch('CAPYBARA_DRIVER', 'headless_chrome').to_sym
 Capybara.ignore_hidden_elements = false
 
 Capybara.register_driver :chrome do |app|
@@ -58,6 +61,28 @@ Capybara.register_driver :headless_chrome do |app|
     # Set download dir for Chrome < 77
     driver.browser.download_path = download_path
   end
+end
+
+#---- From https://gist.github.com/danwhitston/5cea26ae0861ce1520695cff3c2c3315#using-capybara-with-a-remote-selenium-server
+
+Capybara.register_driver :wsl do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--window-size=1440,900')
+  # Chromedriver 77 requires setting this for headless mode on linux
+  # Different versions of Chrome/selenium-webdriver require setting differently - just set them all
+  download_path = Capybara.save_path
+  options.add_preference('download.default_directory', download_path)
+  options.add_preference(:download, default_directory: download_path)
+
+  capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+    chromeOptions: { args: ['disable-dev-shm-usage', 'disable-software-rasterizer', 'mute-audio', 'window-size=1440,900'] }
+  )
+
+  Capybara::Selenium::Driver.new(app,
+    browser:              :remote,
+    url:                  "http://localhost:4444/wd/hub",
+    desired_capabilities: capabilities,
+    options:              options)
 end
 
 # FIXME: remove this line when https://github.com/rspec/rspec-rails/issues/1897 has been fixed
@@ -165,6 +190,27 @@ RSpec.configure do |config|
       select_element && values.all? do |value|
         select_element.first(:option, value).selected?
       end
+    end
+  end
+
+  def save_timestamped_screenshot(page, meta)
+    filename = File.basename(meta[:file_path])
+    line_number = meta[:line_number]
+
+    time_now = Time.zone.now
+    timestamp = "#{time_now.strftime('%Y-%m-%d-%H-%M-%S.')}#{format('%03d', (time_now.usec / 1000).to_i)}"
+
+    screenshot_name = "screenshot-#{filename}-#{line_number}-#{timestamp}.png"
+    screenshot_path = "#{ENV.fetch('CIRCLE_ARTIFACTS', Rails.root.join('tmp', 'capybara'))}/#{screenshot_name}"
+
+    page.save_screenshot(screenshot_path)
+
+    puts "\n  Screenshot: #{screenshot_path}"
+  end
+
+  config.after(:each) do |example|
+    if example.metadata[:js]
+      save_timestamped_screenshot(Capybara.page, example.metadata) if example.exception
     end
   end
 end

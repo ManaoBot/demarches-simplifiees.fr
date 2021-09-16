@@ -12,4 +12,19 @@ class Champs::PieceJustificativeController < ApplicationController
       render :json => { errors: errors }, :status => 422
     end
   end
+
+  def download
+    @champ = read_scope.find(params[:champ_id])
+    if @champ&.is_a? Champs::PieceJustificativeChamp
+      redirect_to @champ.piece_justificative_file.service_url, status: :found
+    else
+      render :json => { errors: "Il n'y a pas de piece justificative #{params[:champ_id]}" }, :status => 404
+    end
+  end
+
+  private
+
+  def read_scope
+    policy_scope(Champ, policy_scope_class: ChampPolicy::ReadScope)
+  end
 end

@@ -20,7 +20,7 @@ feature 'France Connect Particulier Connexion' do
     }
   end
 
-  context 'when user is on login page' do
+  context 'when user is on login page', if: ENV['FC_PARTICULIER_ID'].present? do
     before do
       visit new_user_session_path
     end
@@ -29,7 +29,7 @@ feature 'France Connect Particulier Connexion' do
       expect(page).to have_css('.france-connect-login-button')
     end
 
-    context 'and click on france connect link' do
+    context 'and click on france connect link', if: ENV['FC_PARTICULIER_ID'].present? do
       let(:code) { 'plop' }
 
       context 'when authentification is ok' do

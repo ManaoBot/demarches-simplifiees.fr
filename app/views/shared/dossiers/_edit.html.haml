@@ -22,13 +22,17 @@
           - else
             Pour enregistrer votre dossier et le reprendre plus tard, cliquez sur le bouton « Enregistrer le brouillon » en bas à gauche du formulaire.
       - if !apercu && dossier.france_connect_information.present?
-        = render partial: "shared/dossiers/france_connect_informations", locals: { user_information: dossier.france_connect_information }
+        = render partial: "shared/dossiers/france_connect_informations", locals: { user_information: dossier.france_connect_information, provider: dossier.user.loged_in_with_france_connect }
       - if notice_url(dossier.procedure).present?
         = link_to notice_url(dossier.procedure), target: '_blank', rel: 'noopener', class: 'button notice', title: "Pour vous aider à remplir votre dossier, vous pouvez consulter le guide de cette démarche." do
           %span.icon.info>
           Guide de la démarche
 
     %hr
+
+    -# This button prevent Enter from submitting the form, useful for carte&te_fenua address fields
+    -# See https://stackoverflow.com/a/51507806/5502765
+    %button{ type: :submit, disabled: true, style: 'display: none' } BOUTON
 
     - if dossier.procedure.routee?
       = f.label :groupe_instructeur_id do

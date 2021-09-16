@@ -45,6 +45,9 @@ FactoryBot.define do
     factory :type_de_champ_text do
       type_champ { TypeDeChamp.type_champs.fetch(:text) }
     end
+    factory :type_de_champ_auto_completion do
+      type_champ { TypeDeChamp.type_champs.fetch(:auto_completion) }
+    end
     factory :type_de_champ_textarea do
       type_champ { TypeDeChamp.type_champs.fetch(:textarea) }
     end
@@ -104,6 +107,18 @@ FactoryBot.define do
     factory :type_de_champ_pays do
       type_champ { TypeDeChamp.type_champs.fetch(:pays) }
     end
+    factory :type_de_champ_nationalites do
+      type_champ { TypeDeChamp.type_champs.fetch(:nationalites) }
+    end
+    factory :type_de_champ_commune_de_polynesie do
+      type_champ { TypeDeChamp.type_champs.fetch(:commune_de_polynesie) }
+    end
+    factory :type_de_champ_code_postal_de_polynesie do
+      type_champ { TypeDeChamp.type_champs.fetch(:code_postal_de_polynesie) }
+    end
+    factory :type_de_champ_numero_dn do
+      type_champ { TypeDeChamp.type_champs.fetch(:numero_dn) }
+    end
     factory :type_de_champ_regions do
       type_champ { TypeDeChamp.type_champs.fetch(:regions) }
     end
@@ -148,8 +163,12 @@ FactoryBot.define do
     factory :type_de_champ_carte do
       type_champ { TypeDeChamp.type_champs.fetch(:carte) }
     end
+    factory :type_de_champ_te_fenua do
+      type_champ { TypeDeChamp.type_champs.fetch(:te_fenua) }
+    end
     factory :type_de_champ_repetition do
       type_champ { TypeDeChamp.type_champs.fetch(:repetition) }
+      mandatory { true }
 
       transient do
         types_de_champ { [] }

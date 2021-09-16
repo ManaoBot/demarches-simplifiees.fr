@@ -13,6 +13,17 @@ class PiecesJustificativesService
       .sum(&:byte_size)
   end
 
+  def self.zip_entries(dossier)
+    pjs = champs_zip_entries(dossier) + commentaires_zip_entries(dossier) + dossier_zip_entries(dossier)
+    index = {}
+    pjs.map do |blob, filename|
+      [
+        blob,
+        normalized_filename(index, blob, filename)
+      ]
+    end
+  end
+
   def self.serialize_types_de_champ_as_type_pj(revision)
     tdcs = revision.types_de_champ.filter { |type_champ| type_champ.old_pj.present? }
     tdcs.map.with_index do |type_champ, order_place|
@@ -43,7 +54,42 @@ class PiecesJustificativesService
 
   private
 
-  def self.pjs_for_champs(dossier)
+  def self.normalized_filename(index, attachment, filename)
+    # PF Code
+    # timestamp is replaced by a postfix (-2,-3,-4) which is added only on collapsing filenames (rare)
+
+    # first sanitize the filename as it is based on fields names.
+    sanitized = filename.to_s.split('/').map do |f|
+      ActiveStorage::Filename.new(f).sanitized
+    end
+    # prefix with the folder
+    folder = self.folder(attachment)
+    filename = [folder, *sanitized].join('/')
+    # add optional -Number if filename collide with another
+    i = index[filename]
+    if i.present?
+      i = (index[filename] += 1)
+      filename.sub(/(\.[^.]+)?$/, "-#{i}\\1")
+    else
+      index[filename] = 1
+      filename
+    end
+  end
+
+  def self.folder(attachment)
+    case attachment.record_type
+    when 'Dossier'
+      'dossier'
+    when 'DossierOperationLog', 'BillSignature'
+      'horodatage'
+    when 'Commentaire'
+      'messagerie'
+    else
+      'pieces_justificatives'
+    end
+  end
+
+  def self.pjs_champs(dossier)
     allowed_champs = dossier.champs + dossier.champs_private
 
     allowed_child_champs = allowed_champs
@@ -52,7 +98,10 @@ class PiecesJustificativesService
 
     (allowed_champs + allowed_child_champs)
       .filter { |c| c.type_champ == TypeDeChamp.type_champs.fetch(:piece_justificative) }
-      .map(&:piece_justificative_file)
+  end
+
+  def self.pjs_for_champs(dossier)
+    pjs_champs(dossier).map(&:piece_justificative_file)
   end
 
   def self.pjs_for_commentaires(dossier)
@@ -73,5 +122,28 @@ class PiecesJustificativesService
       bill_signatures.map(&:serialized),
       bill_signatures.map(&:signature)
     ].flatten.compact
+  end
+
+  def self.dossier_zip_entries(dossier)
+    pjs_zip_entries(pjs_for_dossier(dossier))
+  end
+
+  def self.commentaires_zip_entries(dossier)
+    pjs_zip_entries(pjs_for_commentaires(dossier))
+  end
+
+  def self.champs_zip_entries(dossier)
+    pjs_champs(dossier)
+      .filter { |champ| champ.piece_justificative_file.attached? }
+      .map { |champ| [champ.piece_justificative_file, pieces_justificative_filename(champ)] }
+  end
+
+  def self.pieces_justificative_filename(champ)
+    folder = champ.type_de_champ.parent ? "#{champ.type_de_champ.parent.libelle}/" : ""
+    "#{folder}#{champ.type_de_champ.libelle}-#{champ.piece_justificative_file.filename}"
+  end
+
+  def self.pjs_zip_entries(pjs)
+    pjs.filter(&:attached?).map { |c| [c, c.filename] }
   end
 end

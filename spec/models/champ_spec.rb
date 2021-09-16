@@ -150,6 +150,13 @@ describe Champ do
       it { expect(champ.for_export).to eq('123') }
     end
 
+    context 'when type_de_champ is auto_completion' do
+      let(:type_de_champ) { create(:type_de_champ_auto_completion) }
+      let(:value) { '123' }
+
+      it { expect(champ.for_export).to eq('123') }
+    end
+
     context 'when type_de_champ is textarea' do
       let(:type_de_champ) { create(:type_de_champ_textarea) }
       let(:value) { '<b>gras<b>' }
@@ -235,6 +242,27 @@ describe Champ do
         it { is_expected.to eq([value]) }
       end
 
+      context 'for nationalités champ' do
+        let(:type_de_champ) { build(:type_de_champ_nationalites) }
+        let(:value) { "Française" }
+
+        it { is_expected.to eq([value]) }
+      end
+
+      context 'for commune de polynésie champ' do
+        let(:type_de_champ) { build(:type_de_champ_commune_de_polynesie) }
+        let(:value) { "Arue - Tahiti - 98701" }
+
+        it { is_expected.to eq([value]) }
+      end
+
+      context 'for code postal de polynésie champ' do
+        let(:type_de_champ) { build(:type_de_champ_code_postal_de_polynesie) }
+        let(:value) { "98701 - Arue - Tahiti" }
+
+        it { is_expected.to eq([value]) }
+      end
+
       context 'for dossier link champ' do
         let(:type_de_champ) { build(:type_de_champ_dossier_link) }
         let(:value) { "9103132886" }
@@ -294,6 +322,13 @@ describe Champ do
         it { is_expected.to eq(["hello", "world"]) }
       end
 
+      context 'for numero dn champ' do
+        let(:type_de_champ) { build(:type_de_champ_numero_dn) }
+        let(:champ) { type_de_champ.champ.build(numero_dn: "1234567", date_de_naissance: nil) }
+
+        it { is_expected.to eq(["1234567", nil]) }
+      end
+
       context 'for multiple drop down list champ' do
         let(:type_de_champ) { build(:type_de_champ_multiple_drop_down_list) }
 
@@ -320,6 +355,13 @@ describe Champ do
       context 'for pays champ' do
         let(:type_de_champ) { build(:type_de_champ_pays) }
         let(:value) { "FRANCE" }
+
+        it { is_expected.to eq([value]) }
+      end
+
+      context 'for nationalites champ' do
+        let(:type_de_champ) { build(:type_de_champ_nationalites) }
+        let(:value) { "Française" }
 
         it { is_expected.to eq([value]) }
       end
@@ -397,6 +439,13 @@ describe Champ do
 
       context 'for text champ' do
         let(:type_de_champ) { build(:type_de_champ_text) }
+        let(:value) { "Blah" }
+
+        it { is_expected.to eq([value]) }
+      end
+
+      context 'for auto-completion champ' do
+        let(:type_de_champ) { build(:type_de_champ_auto_completion) }
         let(:value) { "Blah" }
 
         it { is_expected.to eq([value]) }

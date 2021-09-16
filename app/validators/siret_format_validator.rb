@@ -2,9 +2,7 @@ class SiretFormatValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     if !format_is_valid(value)
       record.errors.add(attribute, :format)
-    end
-
-    if !luhn_passed(value)
+    elsif !luhn_passed(value)
       record.errors.add(attribute, :checksum)
     end
   end
@@ -14,16 +12,27 @@ class SiretFormatValidator < ActiveModel::EachValidator
   LA_POSTE_SIREN = '356000000'
 
   def format_is_valid(value)
-    value.match?(/^\d{14}$/)
+    case value.length
+    when 6
+      value.match?(/^[0-9A-Z]\d{5}$/)
+    when 14
+      value.match?(/^\d{14}$/)
+    else
+      false
+    end
   end
 
   def luhn_passed(value)
     # Do not enforce Luhn for La Poste SIRET numbers, the only exception to this rule
-    siret_is_attached_to_la_poste(value) || (luhn_checksum(value) % 10 == 0)
+    siret_is_attached_to_la_poste(value) || siret_is_numero_tahiti(value) || (luhn_checksum(value) % 10 == 0)
   end
 
   def siret_is_attached_to_la_poste(value)
     value[0..8] == LA_POSTE_SIREN
+  end
+
+  def siret_is_numero_tahiti(value)
+    return value.length == 6
   end
 
   def luhn_checksum(value)

@@ -49,6 +49,8 @@ describe ProcedureExportService do
           "Traité le",
           "Motivation de la décision",
           "Instructeurs",
+
+          "auto_completion",
           "textarea",
           "date",
           "datetime",
@@ -65,6 +67,10 @@ describe ProcedureExportService do
           "multiple_drop_down_list",
           "linked_drop_down_list",
           "pays",
+          "nationalites",
+          "commune_de_polynesie",
+          "code_postal_de_polynesie",
+          "numero_dn",
           "regions",
           "departements",
           "communes",
@@ -73,6 +79,7 @@ describe ProcedureExportService do
           "piece_justificative",
           "siret",
           "carte",
+          "te_fenua",
           "titre_identite",
           "iban",
           "annuaire_education",
@@ -94,6 +101,8 @@ describe ProcedureExportService do
         en_instruction_at = Time.zone.at(dossiers_sheet.data[0][9] - offset.seconds)
         expect(en_construction_at).to eq(dossier.en_construction_at.round)
         expect(en_instruction_at).to eq(dossier.en_instruction_at.round)
+        expect(dossiers_sheet.data[0][dossiers_sheet.headers.index('date')]).to be_a(Date)
+        expect(dossiers_sheet.data[0][dossiers_sheet.headers.index('datetime')]).to be_a(Time)
       end
 
       context 'with a birthdate' do
@@ -108,7 +117,7 @@ describe ProcedureExportService do
       context 'with a procedure routee' do
         before { procedure.groupe_instructeurs.create(label: '2') }
 
-        let(:routee_headers) { nominal_headers.insert(nominal_headers.index('textarea'), 'Groupe instructeur') }
+        let(:routee_headers) { nominal_headers.insert(nominal_headers.index('auto_completion'), 'Groupe instructeur') }
 
         it { expect(dossiers_sheet.headers).to match(routee_headers) }
         it { expect(dossiers_sheet.data[0][dossiers_sheet.headers.index('Groupe instructeur')]).to eq('défaut') }
@@ -135,6 +144,7 @@ describe ProcedureExportService do
           "Traité le",
           "Motivation de la décision",
           "Instructeurs",
+          "auto_completion",
           "textarea",
           "date",
           "datetime",
@@ -151,6 +161,10 @@ describe ProcedureExportService do
           "multiple_drop_down_list",
           "linked_drop_down_list",
           "pays",
+          "nationalites",
+          "commune_de_polynesie",
+          "code_postal_de_polynesie",
+          "numero_dn",
           "regions",
           "departements",
           "communes",
@@ -159,6 +173,7 @@ describe ProcedureExportService do
           "piece_justificative",
           "siret",
           "carte",
+          "te_fenua",
           "titre_identite",
           "iban",
           "annuaire_education",
@@ -179,7 +194,7 @@ describe ProcedureExportService do
           [
             "ID",
             "Email",
-            "Établissement SIRET",
+            "Établissement Numéro TAHITI",
             "Établissement siège social",
             "Établissement NAF",
             "Établissement libellé NAF",
@@ -198,7 +213,7 @@ describe ProcedureExportService do
             "Entreprise forme juridique code",
             "Entreprise nom commercial",
             "Entreprise raison sociale",
-            "Entreprise SIRET siège social",
+            "Entreprise Numéro TAHITI siège social",
             "Entreprise code effectif entreprise",
             "Entreprise date de création",
             "Entreprise nom",
@@ -217,6 +232,7 @@ describe ProcedureExportService do
             "Traité le",
             "Motivation de la décision",
             "Instructeurs",
+            "auto_completion",
             "textarea",
             "date",
             "datetime",
@@ -233,6 +249,10 @@ describe ProcedureExportService do
             "multiple_drop_down_list",
             "linked_drop_down_list",
             "pays",
+            "nationalites",
+            "commune_de_polynesie",
+            "code_postal_de_polynesie",
+            "numero_dn",
             "regions",
             "departements",
             "communes",
@@ -241,6 +261,7 @@ describe ProcedureExportService do
             "piece_justificative",
             "siret",
             "carte",
+            "te_fenua",
             "titre_identite",
             "iban",
             "annuaire_education",
@@ -261,7 +282,7 @@ describe ProcedureExportService do
         expect(etablissements_sheet.headers).to eq([
           "Dossier ID",
           "Champ",
-          "Établissement SIRET",
+          "Établissement Numéro TAHITI",
           "Etablissement enseigne",
           "Établissement siège social",
           "Établissement NAF",
@@ -281,7 +302,7 @@ describe ProcedureExportService do
           "Entreprise forme juridique code",
           "Entreprise nom commercial",
           "Entreprise raison sociale",
-          "Entreprise SIRET siège social",
+          "Entreprise Numéro TAHITI siège social",
           "Entreprise code effectif entreprise",
           "Entreprise date de création",
           "Entreprise nom",

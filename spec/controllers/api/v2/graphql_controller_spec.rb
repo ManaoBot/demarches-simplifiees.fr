@@ -507,10 +507,12 @@ describe API::V2::GraphqlController do
         let(:type_de_champ_datetime) { build(:type_de_champ_datetime) }
         let(:champ_date) { dossier.champs.first }
         let(:champ_datetime) { dossier.champs.second }
+        let(:date) { '2019-07-10' }
+        let(:datetime) { '15/09/1962 15:35' }
 
         before do
-          champ_date.update(value: '2019-07-10')
-          champ_datetime.update(value: '15/09/1962 15:35')
+          champ_date.update(value: date)
+          champ_datetime.update(value: datetime)
         end
 
         context "with Date" do
@@ -535,12 +537,12 @@ describe API::V2::GraphqlController do
                 {
                   id: champ_date.to_typed_id,
                   label: champ_date.libelle,
-                  value: '2019-07-10T00:00:00+02:00'
+                  value: Time.zone.parse(date).iso8601
                 },
                 {
                   id: champ_datetime.to_typed_id,
                   label: champ_datetime.libelle,
-                  value: '1962-09-15T15:35:00+01:00'
+                  value: Time.zone.parse(datetime).iso8601
                 }
               ]
             })
@@ -573,13 +575,13 @@ describe API::V2::GraphqlController do
                 {
                   id: champ_date.to_typed_id,
                   label: champ_date.libelle,
-                  value: '2019-07-10T00:00:00+02:00',
+                  value: '2019-07-10T00:00:00-10:00',
                   date: '2019-07-10'
                 },
                 {
                   id: champ_datetime.to_typed_id,
                   label: champ_datetime.libelle,
-                  datetime: '1962-09-15T15:35:00+01:00'
+                  datetime: '1962-09-15T15:35:00-10:00'
                 }
               ]
             })
@@ -777,6 +779,67 @@ describe API::V2::GraphqlController do
           it "should fail" do
             expect(gql_errors).to eq(nil)
             expect(gql_data).to eq(dossierPasserEnInstruction: {
+              errors: [{ message: 'L’instructeur n’a pas les droits d’accès à ce dossier' }],
+              dossier: nil
+            })
+          end
+        end
+      end
+
+      describe 'dossierRepasserEnInstruction' do
+        let(:dossier) { create(:dossier, :accepte, :with_individual, procedure: procedure) }
+        let(:instructeur_id) { instructeur.to_typed_id }
+        let(:query) do
+          "mutation {
+            dossierRepasserEnInstruction(input: {
+              dossierId: \"#{dossier.to_typed_id}\",
+              instructeurId: \"#{instructeur_id}\"
+            }) {
+              dossier {
+                id
+                state
+                motivation
+              }
+              errors {
+                message
+              }
+            }
+          }"
+        end
+
+        context 'success' do
+          it "should repasser en instruction dossier" do
+            expect(gql_errors).to eq(nil)
+
+            expect(gql_data).to eq(dossierRepasserEnInstruction: {
+              dossier: {
+                id: dossier.to_typed_id,
+                state: "en_instruction",
+                motivation: nil
+              },
+              errors: nil
+            })
+          end
+        end
+
+        context 'validation error' do
+          let(:dossier) { create(:dossier, :en_instruction, :with_individual, procedure: procedure) }
+
+          it "should fail" do
+            expect(gql_errors).to eq(nil)
+            expect(gql_data).to eq(dossierRepasserEnInstruction: {
+              errors: [{ message: "Le dossier ne peut repasser en instruction lorsqu'il est en instruction" }],
+              dossier: nil
+            })
+          end
+        end
+
+        context 'instructeur error' do
+          let(:instructeur_id) { create(:instructeur).to_typed_id }
+
+          it "should fail" do
+            expect(gql_errors).to eq(nil)
+            expect(gql_data).to eq(dossierRepasserEnInstruction: {
               errors: [{ message: 'L’instructeur n’a pas les droits d’accès à ce dossier' }],
               dossier: nil
             })

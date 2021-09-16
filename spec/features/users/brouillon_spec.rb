@@ -1,5 +1,5 @@
 feature 'The user' do
-  let(:password) { 'my-s3cure-p4ssword' }
+  let(:password) { TEST_PASSWORD }
   let!(:user) { create(:user, password: password) }
 
   let!(:procedure) { create(:procedure, :published, :for_individual, :with_all_champs_mandatory) }
@@ -36,6 +36,10 @@ feature 'The user' do
 
     select_champ_geo('communes', 'Ambl', 'Ambléon (01300)')
 
+    select('Australienne', from: 'nationalites')
+    select('Mahina - Tahiti - 98709', from: 'commune_de_polynesie')
+    select('98709 - Mahina - Tahiti', from: 'code_postal_de_polynesie')
+
     check('engagement')
     fill_in('dossier_link', with: '123')
     find('.editable-champ-piece_justificative input[type=file]').attach_file(Rails.root + 'spec/fixtures/files/file.pdf')
@@ -64,6 +68,11 @@ feature 'The user' do
     expect(champ_value_for('regions')).to eq('Martinique')
     expect(champ_value_for('departements')).to eq('02 - Aisne')
     expect(champ_value_for('communes')).to eq('Ambléon (01300)')
+
+    expect(champ_value_for('nationalites')).to eq('Australienne')
+    expect(champ_value_for('commune_de_polynesie')).to eq('Mahina - Tahiti - 98709')
+    expect(champ_value_for('code_postal_de_polynesie')).to eq('98709 - Mahina - Tahiti')
+
     expect(champ_value_for('engagement')).to eq('on')
     expect(champ_value_for('dossier_link')).to eq('123')
     expect(champ_value_for('piece_justificative')).to be_nil # antivirus hasn't approved the file yet
@@ -85,6 +94,11 @@ feature 'The user' do
     expect(page).to have_checked_field('val3')
     expect(page).to have_selected_value('simple_choice_drop_down_list_long', selected: 'bravo')
     check_selected_values('multiple_choice_drop_down_list_long', ['alpha', 'charly'])
+
+    expect(page).to have_selected_value('nationalites', selected: 'Australienne')
+    expect(page).to have_selected_value('commune_de_polynesie', selected: 'Mahina - Tahiti - 98709')
+    expect(page).to have_selected_value('code_postal_de_polynesie', selected: '98709 - Mahina - Tahiti')
+
     expect(page).to have_hidden_field('pays', with: 'AUSTRALIE')
     expect(page).to have_hidden_field('regions', with: 'Martinique')
     expect(page).to have_hidden_field('departements', with: '02 - Aisne')

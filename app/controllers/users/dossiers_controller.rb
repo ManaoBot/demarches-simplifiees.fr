@@ -4,7 +4,7 @@ module Users
 
     layout 'procedure_context', only: [:identite, :update_identite, :siret, :update_siret]
 
-    ACTIONS_ALLOWED_TO_ANY_USER = [:index, :recherche, :new]
+    ACTIONS_ALLOWED_TO_ANY_USER = [:index, :recherche, :new, :qrcode]
     ACTIONS_ALLOWED_TO_OWNER_OR_INVITE = [:show, :demande, :messagerie, :brouillon, :update_brouillon, :modifier, :update, :create_commentaire]
 
     before_action :ensure_ownership!, except: ACTIONS_ALLOWED_TO_ANY_USER + ACTIONS_ALLOWED_TO_OWNER_OR_INVITE
@@ -56,6 +56,20 @@ module Users
       end
     end
 
+    def qrcode
+      if dossier.match_encoded_date?(:created_at, params[:created_at])
+        attestation_template = dossier.procedure.attestation_template
+        if attestation_template&.activated
+          @attestation = attestation_template.render_attributes_for(dossier: dossier)
+          render 'qrcode'
+        else
+          attestation
+        end
+      else
+        forbidden!
+      end
+    end
+
     def identite
       @dossier = dossier
       @user = current_user
@@ -88,9 +102,11 @@ module Users
       # This is the only remaining use of User#siret: it could be refactored away.
       # However some existing users have a siret but no associated etablissement,
       # so we would need to analyze the legacy data and decide what to do with it.
-      current_user.siret = siret_params[:siret]
+      siret = siret_params[:siret]
 
-      siret_model = Siret.new(siret: siret_params[:siret])
+      current_user.siret = siret
+
+      siret_model = Siret.new(siret: siret)
       if !siret_model.valid?
         return render_siret_error(siret_model.errors.full_messages)
       end
@@ -323,8 +339,8 @@ module Users
     def champs_params
       params.permit(dossier: {
         champs_attributes: [
-          :id, :value, :external_id, :primary_value, :secondary_value, :piece_justificative_file, value: [],
-          champs_attributes: [:id, :_destroy, :value, :external_id, :primary_value, :secondary_value, :piece_justificative_file, value: []]
+          :id, :value, :external_id, :primary_value, :secondary_value, :piece_justificative_file, :date_de_naissance, :numero_dn, value: [],
+          champs_attributes: [:id, :_destroy, :value, :external_id, :primary_value, :secondary_value, :piece_justificative_file, :date_de_naissance, :numero_dn, value: []]
         ]
       })
     end

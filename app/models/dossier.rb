@@ -449,7 +449,7 @@ class Dossier < ApplicationRecord
       parts = [
         "Dossier en brouillon répondant à la démarche ",
         procedure.libelle,
-        " gérée par l'organisme ",
+        " gérée par l’organisme ",
         procedure.organisation_name
       ]
     else
@@ -458,7 +458,7 @@ class Dossier < ApplicationRecord
         en_construction_at.strftime("%d/%m/%Y"),
         " sur la démarche ",
         procedure.libelle,
-        " gérée par l'organisme ",
+        " gérée par l’organisme ",
         procedure.organisation_name
       ]
     end
@@ -500,7 +500,11 @@ class Dossier < ApplicationRecord
 
   def geo_position
     if etablissement.present?
-      point = Geocoder.search(etablissement.geo_adresse).first
+      begin
+        geocoder_search = Geocoder.search(etablissement.geo_adresse)
+        point = geocoder_search&.first
+      rescue NoMethodError
+      end
     end
 
     lon = Champs::CarteChamp::DEFAULT_LON.to_s
@@ -522,6 +526,10 @@ class Dossier < ApplicationRecord
     else
       []
     end
+  end
+
+  def unspecified_champs
+    (unspecified_attestation_champs + procedure.closed_mail_template.unspecified_champs_for_dossier(self)).uniq
   end
 
   def build_attestation
@@ -673,6 +681,21 @@ class Dossier < ApplicationRecord
       end
   end
 
+  def match_encoded_date?(field, encoded_date)
+    datetime = send(field)
+    if (match = encoded_date.match(/([0-9a-f]{8})-([0-9a-f]{0,8})/))
+      seconds, nseconds = match.captures.map { |x| x.to_i(16) }
+      seconds == datetime.to_i && nseconds == datetime.nsec
+    else
+      false
+    end
+  end
+
+  def encoded_date(field)
+    datetime = send(field)
+    datetime.to_i.to_s(16) + '-' + datetime.nsec.to_s(16)
+  end
+
   def log_modifier_annotations!(instructeur)
     champs_private.filter(&:value_previously_changed?).each do |champ|
       log_dossier_operation(instructeur, :modifier_annotation, champ)
@@ -700,6 +723,7 @@ class Dossier < ApplicationRecord
   end
 
   def spreadsheet_columns(with_etablissement: false, types_de_champ:, types_de_champ_private:)
+    # any modification in this method must be reflected in procedure fixed_column_offset
     columns = [
       ['ID', id.to_s],
       ['Email', user.email]
@@ -716,7 +740,7 @@ class Dossier < ApplicationRecord
       end
     elsif with_etablissement
       columns += [
-        ['Établissement SIRET', etablissement&.siret],
+        ['Établissement Numéro TAHITI', etablissement&.siret],
         ['Établissement siège social', etablissement&.siege_social],
         ['Établissement NAF', etablissement&.naf],
         ['Établissement libellé NAF', etablissement&.libelle_naf],
@@ -735,7 +759,7 @@ class Dossier < ApplicationRecord
         ['Entreprise forme juridique code', etablissement&.entreprise_forme_juridique_code],
         ['Entreprise nom commercial', etablissement&.entreprise_nom_commercial],
         ['Entreprise raison sociale', etablissement&.entreprise_raison_sociale],
-        ['Entreprise SIRET siège social', etablissement&.entreprise_siret_siege_social],
+        ['Entreprise Numéro TAHITI siège social', etablissement&.entreprise_siret_siege_social],
         ['Entreprise code effectif entreprise', etablissement&.entreprise_code_effectif_entreprise],
         ['Entreprise date de création', etablissement&.entreprise_date_creation],
         ['Entreprise nom', etablissement&.entreprise_nom],

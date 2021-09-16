@@ -12,6 +12,7 @@ AllCops:
     - "db/migrate/20190730153555_recreate_structure.rb"
     - "bin/*"
     - "node_modules/**/*"
+    - "vendor/**/*"
 
 DS/Unscoped:
   Enabled: true
@@ -20,9 +21,11 @@ DS/ApplicationName:
   Enabled: true
   Exclude:
     - './config/application_name.rb'
+    - './config/initializers/constants.rb'
     - './lib/cops/application_name.rb'
     - './lib/linters/application_name_linter.rb'
     - "./spec/**/*"
+
 
 Bundler/DuplicatedGem:
   Enabled: true
@@ -350,7 +353,7 @@ Lint/EmptyInterpolation:
   Enabled: true
 
 Lint/EmptyWhen:
-  Enabled: true
+  Enabled: false
 
 Lint/EnsureReturn:
   Enabled: false

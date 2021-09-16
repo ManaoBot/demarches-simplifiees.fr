@@ -1,0 +1,230 @@
+version: '3.3'
+
+#------------------------------------------------------------
+# This docker compose describes the two services running on
+# top of Rails.
+# To work, this configuration requires
+#    - a running Postgress instance
+#    - environment variables defined via .env file
+#
+# This configuration file defines 4 machines
+#   - app: Main rails application (frontend)
+#   - worker: responsible of running jobs like sending mails, virus analysis
+#   - clamav: antivirus used to verify documents attached to forms
+# Variables
+# IMAGE : name of the docker image to run (sipf/mes-demarches)
+# TAG : Tag of the image to run (eg master or devpf or b38)
+# ITAIETE_TAG: tag of the itaieate image to run.
+#
+# APP_HOST: host:port pointing to the application to allows creation of absolute links
+#
+# API_ENTREPRISE_PF_AUTH keycloak URL to connect to iteiete realm
+# API_ENTREPRISE_PF_URL itaiete url
+# API_ISPF_USER: ISPF API configuration
+# API_ISPF_PASSWORD
+#
+# DB_DATABASE: database configuration
+# DB_HOST
+# DB_USERNAME
+# DB_PASSWORD
+#
+# NETWORK_SLOT: Optional, default to 0, Number between 0 and 255 allowing to run multiple env (dev, staging)
+#
+# MAILJET_API_KEY:
+# MAILJET_SECRET_KEY: MAILJET configuration to use to send mails
+#
+# SENTRY variables to logs exception on the SEntry platform
+# HELPSCOUT variable to be able to receive administrator requests & help requests
+# UNIVERSIGN variable to timstamp service (horodatage)
+#-------------------------------------------------------------
+services:
+  app:
+    image: ${IMAGE}:${TAG:-latest}
+    container_name: app-${ENV:-dev}
+    restart: always
+    ports:
+      - ${PORT}:3000
+    environment:
+      - API_ADRESSE_URL
+      - API_CPS_AUTH
+      - API_CPS_CLIENT_ID
+      - API_CPS_CLIENT_SECRET
+      - API_CPS_PASSWORD
+      - API_CPS_URL
+      - API_CPS_USERNAME
+      - API_EDUCATION_URL
+      - API_ENTREPRISE_PF_AUTH
+      - API_ENTREPRISE_PF_URL
+      - API_GEO_URL
+      - API_ISPF_PASSWORD
+      - API_ISPF_USER
+      - APPLICATION_BASE_URL
+      - APPLICATION_NAME
+      - APP_HOST
+      - BANNER_MESSAGE
+      - CLAMD_TCP_HOST=clamav-${ENV:-dev}
+      - CLAMD_TCP_PORT=3310
+      - CRISP_CLIENT_KEY
+      - CRISP_ENABLED
+      - DB_DATABASE
+      - DB_HOST
+      - DB_PASSWORD
+      - DB_USERNAME
+      - DEMANDE_INSCRIPTION_ADMIN_PAGE_URL
+      - DOC_URL
+      - DS_PROXY_URL
+      - FAVICON_16PX_SRC
+      - FAVICON_32PX_SRC
+      - FAVICON_96PX_SRC
+      - FC_PARTICULIER_BASE_URL
+      - FC_PARTICULIER_ID
+      - FC_PARTICULIER_SECRET
+      - GITHUB_CLIENT_ID
+      - GITHUB_CLIENT_SECRET
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET
+      - HELPSCOUT_CLIENT_ID
+      - HELPSCOUT_CLIENT_SECRET
+      - HELPSCOUT_MAILBOX_ID
+      - HELPSCOUT_WEBHOOK_SECRET
+      - MATOMO_ENABLED
+      - MATOMO_ID
+      - MICROSOFT_CLIENT_ID
+      - MICROSOFT_CLIENT_SECRET
+      - OTP_SECRET_KEY
+      - PROCEDURE_DEFAULT_LOGO_SRC
+      - SAML_IDP_CERTIFICATE
+      - SAML_IDP_SECRET_KEY
+      - S3_ENDPOINT
+      - S3_BUCKET
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
+      - S3_REGION
+      - SENTRY_CURRENT_ENV
+      - SENTRY_DSN_JS
+      - SENTRY_DSN_RAILS
+      - SENTRY_ENABLED
+      - SIPF_CLIENT_BASE_URL
+      - SIPF_CLIENT_ID
+      - SIPF_CLIENT_SECRET
+      - STORAGE
+      - STORAGE_SWITCH
+      - TATOU_BASE_URL
+      - TATOU_CLIENT_ID
+      - TATOU_CLIENT_SECRET
+      - WATERMARK_FILE
+      - YAHOO_CLIENT_ID
+      - YAHOO_CLIENT_SECRET
+    volumes:
+      - md-data-files:/app/storage
+      - md-tmp:/app/tmp
+      - md-logo-uploads:/app/public/uploads
+      - md-logo-downloads:/app/public/downloads
+    networks:
+      - md-network
+
+  worker:
+    image: ${IMAGE}:${TAG}
+    entrypoint: ["bundle", "exec"]
+    command: rails jobs:work
+    container_name: worker-${ENV:-dev}
+    restart: always
+    environment:
+      - APPLICATION_BASE_URL
+      - APPLICATION_NAME
+      - APP_HOST
+      - CLAMD_TCP_HOST=clamav-${ENV:-dev}
+      - CLAMD_TCP_PORT=3310
+      - DB_DATABASE
+      - DB_HOST
+      - DB_PASSWORD
+      - DB_USERNAME
+      - MAILJET_API_KEY
+      - MAILJET_SECRET_KEY
+      - PROCEDURE_DEFAULT_LOGO_SRC
+      - S3_ENDPOINT
+      - S3_BUCKET
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
+      - S3_REGION
+      - SENTRY_CURRENT_ENV
+      - SENTRY_DSN_JS
+      - SENTRY_DSN_RAILS
+      - SENTRY_ENABLED
+      - STORAGE
+      - STORAGE_SWITCH
+      - UNIVERSIGN_USERPWD
+      - UNIVERSIGN_API_URL
+      - WATERMARK_FILE
+    volumes:
+      - md-data-files:/app/storage
+      - md-root-tmp:/tmp
+      - md-tmp:/app/tmp
+    networks:
+      - md-network
+
+  clamav:
+    image: matau/clamav
+    container_name: clamav-${ENV:-dev}
+    restart: always
+    ports:
+      - 3310:3310
+    volumes:
+      - clamav-db:/data
+      - clamav-logs:/var/log/clamav
+      - md-root-tmp:/tmp
+    networks:
+      - md-network
+
+volumes:
+  md-data-files:
+    driver: local
+    driver_opts:
+      type: none
+      device: $ROOT/data
+      o: bind
+  md-logo-uploads:
+    driver: local
+    driver_opts:
+      type: none
+      device: $ROOT/logos/uploads
+      o: bind
+  md-logo-downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: $ROOT/logos/downloads
+      o: bind
+  md-tmp:
+    driver: local
+    driver_opts:
+      type: none
+      device: $ROOT/tmp
+      o: bind
+  #----- to share file between worker and clamav
+  md-root-tmp:
+    driver_opts:
+      type: none
+      device: $ROOT/systmp
+      o: bind
+  clamav-db:
+    driver: local
+    driver_opts:
+      type: none
+      device: $ROOT/clamav/db
+      o: bind
+  clamav-logs:
+    driver: local
+    driver_opts:
+      type: none
+      device: $ROOT/clamav/log
+      o: bind
+
+
+networks:
+  md-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.${NETWORK_SLOT:-0}.0/24
+

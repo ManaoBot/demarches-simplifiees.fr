@@ -1,6 +1,6 @@
 describe Users::SessionsController, type: :controller do
   let(:email) { 'unique@plop.com' }
-  let(:password) { 'my-s3cure-p4ssword' }
+  let(:password) { TEST_PASSWORD }
   let(:loged_in_with_france_connect) { User.loged_in_with_france_connects.fetch(:particulier) }
   let!(:user) { create(:user, email: email, password: password, loged_in_with_france_connect: loged_in_with_france_connect) }
 
@@ -9,7 +9,7 @@ describe Users::SessionsController, type: :controller do
   end
 
   describe '#create' do
-    let(:user) { create(:user, email: email, password: password, loged_in_with_france_connect: 'particulier') }
+    let(:user) { create(:user, email: email, password: password, loged_in_with_france_connect: loged_in_with_france_connect) }
     let(:send_password) { password }
     let(:remember_me) { '0' }
 
@@ -101,6 +101,24 @@ describe Users::SessionsController, type: :controller do
 
       it 'redirect to france connect logout page' do
         expect(response).to redirect_to(FRANCE_CONNECT[:particulier][:logout_endpoint])
+      end
+    end
+
+    context 'when user is connected with sipf keycloak' do
+      let(:loged_in_with_france_connect) { User.loged_in_with_france_connects.fetch(:sipf) }
+
+      it 'redirect to sipf logout page' do
+        params = { redirect_uri: root_url }
+        expect(response).to redirect_to("#{Rails.application.secrets.sipf[:logout_endpoint]}?#{params.to_query}")
+      end
+    end
+
+    context 'when user is connected with CPS keycloak' do
+      let(:loged_in_with_france_connect) { User.loged_in_with_france_connects.fetch(:tatou) }
+
+      it 'redirect to tatou logout page' do
+        params = { redirect_uri: root_url }
+        expect(response).to redirect_to("#{Rails.application.secrets.tatou[:logout_endpoint]}?#{params.to_query}")
       end
     end
 

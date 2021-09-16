@@ -45,7 +45,6 @@
 #  created_at                               :datetime
 #  updated_at                               :datetime
 #  dossier_id                               :integer
-#  entreprise_id                            :integer
 #
 class Etablissement < ApplicationRecord
   self.ignored_columns = [:entreprise_id]
@@ -92,7 +91,7 @@ class Etablissement < ApplicationRecord
     [
       ['Dossier ID', :dossier_id_for_export],
       ['Champ', :libelle_for_export],
-      ['Établissement SIRET', :siret],
+      ['Établissement Numéro TAHITI', :siret],
       ['Etablissement enseigne', :enseigne],
       ['Établissement siège social', :siege_social],
       ['Établissement NAF', :naf],
@@ -112,7 +111,7 @@ class Etablissement < ApplicationRecord
       ['Entreprise forme juridique code', :entreprise_forme_juridique_code],
       ['Entreprise nom commercial', :entreprise_nom_commercial],
       ['Entreprise raison sociale', :entreprise_raison_sociale],
-      ['Entreprise SIRET siège social', :entreprise_siret_siege_social],
+      ['Entreprise Numéro TAHITI siège social', :entreprise_siret_siege_social],
       ['Entreprise code effectif entreprise', :entreprise_code_effectif_entreprise],
       ['Entreprise date de création', :entreprise_date_creation],
       ['Entreprise nom', :entreprise_nom],

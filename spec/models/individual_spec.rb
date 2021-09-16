@@ -4,15 +4,46 @@ describe Individual do
   it { is_expected.to have_db_column(:prenom) }
   it { is_expected.to belong_to(:dossier).required }
 
-  describe "#save" do
-    let(:individual) { build(:individual) }
+  describe "prenom normalisation" do
+    test_data = {
+      ' ADÉLAIDE  ' => 'Adélaide',
+      'ANNE GAELLE' => 'Anne Gaelle',
+      'ANNE-GAELLE' => 'Anne-Gaelle',
+      'franÇois-jean' => "François-Jean",
+      'gilbert' => "Gilbert",
+      'arthur, gilbert andré , roger' => 'Arthur, Gilbert André , Roger'
+    }
+    test_data.each do |input, expected|
+      it "normalisation of #{input}" do
+        individual = create(:individual, prenom: input)
+        expect(individual.prenom).to eq(expected)
+      end
+    end
+  end
 
-    subject { individual.save }
+  describe "nom normalisation" do
+    test_data = {
+      'lefèvre' => 'LEFÈVRE',
+      'de la tourandière' => 'DE LA TOURANDIÈRE',
+      'Lalumière-Dufour' => 'LALUMIÈRE-DUFOUR',
+      "D'Ornano" => "D'ORNANO",
+      ' noël ' => "NOËL"
+    }
+    test_data.each do |input, expected|
+      it "normalisation of #{input}" do
+        individual = create(:individual, nom: input)
+        expect(individual.nom).to eq(expected)
+      end
+    end
+  end
+
+  describe "#save" do
+    let(:individual) { build(:individual, prenom: 'adÉlaÏde') }
 
     context "with birthdate" do
       before do
         individual.birthdate = birthdate_from_user
-        subject
+        individual.save
       end
 
       context "and the format is dd/mm/yyy " do

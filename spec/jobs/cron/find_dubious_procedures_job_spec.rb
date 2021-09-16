@@ -18,7 +18,9 @@ RSpec.describe Cron::FindDubiousProceduresJob, type: :job do
       let(:forbidden_tdcs) do
         [
           build(:type_de_champ, libelle: 'num de securite sociale, stp'),
-          build(:type_de_champ, libelle: "t'aurais une carte bancaire ?")
+          build(:type_de_champ, libelle: "t'aurais une carte bancaire ?"),
+          build(:type_de_champ, libelle: 'Parents biologiques'),
+          build(:type_de_champ, libelle: 'Salaire de base')
         ]
       end
 
@@ -36,26 +38,26 @@ RSpec.describe Cron::FindDubiousProceduresJob, type: :job do
       context 'and a whitelisted procedure' do
         let(:procedure) { create(:procedure, :whitelisted) }
 
-        it { expect(AdministrationMailer).to have_received(:dubious_procedures).with([]) }
+        it { expect(AdministrationMailer).to_not have_received(:dubious_procedures) }
       end
 
       context 'and a closed procedure' do
         let(:procedure) { create(:procedure, :closed) }
 
-        it { expect(AdministrationMailer).to have_received(:dubious_procedures).with([]) }
+        it { expect(AdministrationMailer).to_not have_received(:dubious_procedures) }
       end
 
       context 'and a discarded procedure' do
         let(:procedure) { create(:procedure, :discarded) }
 
-        it { expect(AdministrationMailer).to have_received(:dubious_procedures).with([]) }
+        it { expect(AdministrationMailer).to_not have_received(:dubious_procedures) }
       end
     end
 
     context 'with no suspicious champs' do
       let(:tdcs) { [allowed_tdc] }
 
-      it { expect(AdministrationMailer).to have_received(:dubious_procedures).with([]) }
+      it { expect(AdministrationMailer).to_not have_received(:dubious_procedures) }
     end
   end
 end

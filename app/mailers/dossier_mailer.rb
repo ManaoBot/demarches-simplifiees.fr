@@ -127,6 +127,13 @@ class DossierMailer < ApplicationMailer
     mail(to: to_email, subject: @subject)
   end
 
+  def notify_dossier_not_submitted(dossier)
+    @subject = "Attention : votre dossier n'est pas déposé."
+    @dossier = dossier
+
+    mail(to: dossier.user.email, subject: @subject)
+  end
+
   def notify_groupe_instructeur_changed(instructeur, dossier)
     @subject = "Un dossier a changé de groupe instructeur"
     @dossier_id = dossier.id

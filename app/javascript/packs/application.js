@@ -8,6 +8,7 @@ import '../shared/page-update-event';
 import '../shared/activestorage/ujs';
 import '../shared/remote-poller';
 import '../shared/safari-11-file-xhr-workaround';
+import '../shared/autocomplete';
 import '../shared/remote-input';
 import '../shared/franceconnect';
 import '../shared/toggle-target';
@@ -17,10 +18,14 @@ import '../new_design/dropdown';
 import '../new_design/form-validation';
 import '../new_design/procedure-context';
 import '../new_design/procedure-form';
+import '../new_design/select2';
 import '../new_design/spinner';
 import '../new_design/support';
 import '../new_design/dossiers/auto-save';
 import '../new_design/dossiers/auto-upload';
+
+import '../new_design/champs/te_fenua';
+import '../new_design/champs/numero_dn';
 
 import '../new_design/champs/carte';
 import '../new_design/champs/linked-drop-down-list';

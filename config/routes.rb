@@ -76,6 +76,12 @@ Rails.application.routes.draw do
   get "/ping" => "ping#index"
 
   #
+  # password test
+  #
+  get '/password_mock' => 'password_mock#new'
+  post '/password_mock' => 'password_mock#create'
+  get '/password_mock/test_strength' => 'password_mock#test_strength'
+  #
   # Authentication
   #
 
@@ -102,10 +108,7 @@ Rails.application.routes.draw do
     get '/users/no_procedure' => 'users/sessions#no_procedure'
     get 'connexion-par-jeton/:id' => 'users/sessions#sign_in_by_link', as: 'sign_in_by_link'
     get 'lien-envoye/:email' => 'users/sessions#link_sent', constraints: { email: /.*/ }, as: 'link_sent'
-  end
-
-  devise_scope :administrateur do
-    get '/administrateurs/password/test_strength' => 'administrateurs/passwords#test_strength'
+    get '/users/passwords/test_strength/:complexity' => 'users/passwords#test_strength', constraints: { complexity: /\d/ }, as: 'test_password_strength'
   end
 
   #
@@ -126,8 +129,12 @@ Rails.application.routes.draw do
     get 'particulier/callback' => 'particulier#callback'
   end
 
+  get '/auth/:provider' => 'omniauth#login', as: :omniauth, constraints: { :provider => /google|microsoft|yahoo|tatou|sipf/ }
+  get '/auth/:provider/callback', to: 'omniauth#callback', constraints: { :provider => /google|microsoft|yahoo|tatou|sipf/ }
+
   namespace :champs do
     get ':position/siret', to: 'siret#show', as: :siret
+    get 'dn', to: 'numero_dn#show', as: :dn
     get ':position/dossier_link', to: 'dossier_link#show', as: :dossier_link
     post ':position/carte', to: 'carte#show', as: :carte
 
@@ -139,6 +146,7 @@ Rails.application.routes.draw do
 
     post ':position/repetition', to: 'repetition#show', as: :repetition
     put 'piece_justificative/:champ_id', to: 'piece_justificative#update', as: :piece_justificative
+    get 'piece_justificative/:champ_id', to: 'piece_justificative#download', as: :piece_justificative_download
   end
 
   resources :attachments, only: [:show, :destroy]
@@ -147,6 +155,7 @@ Rails.application.routes.draw do
   get "accessibilite" => "root#accessibilite"
   get "suivi" => "root#suivi"
   post "dismiss_outdated_browser" => "root#dismiss_outdated_browser"
+  post "dismiss_new_look" => "root#dismiss_new_look"
 
   get "contact", to: "support#index"
   post "contact", to: "support#create"
@@ -183,6 +192,7 @@ Rails.application.routes.draw do
   namespace :admin do
     get 'activate' => '/administrateurs/activate#new'
     patch 'activate' => '/administrateurs/activate#create'
+    get 'activate/test_strength' => '/administrateurs/activate#test_strength' # redirect to password
     get 'procedures/archived', to: redirect('/admin/procedures?statut=archivees')
     get 'procedures/draft', to: redirect('/admin/procedures?statut=brouillons')
 
@@ -208,6 +218,11 @@ Rails.application.routes.draw do
 
     resources :instructeurs, only: [:index, :create, :destroy]
   end
+
+  #
+  # te_fenua
+  #
+  get 'te_fenua/suggestions' => 'te_fenua#suggestions'
 
   resources :invites, only: [:show, :destroy] do
     collection do
@@ -250,6 +265,7 @@ Rails.application.routes.draw do
       get '/:path/sign_in', action: 'sign_in', as: :sign_in
       get '/:path/sign_up', action: 'sign_up', as: :sign_up
       get '/:path/france_connect', action: 'france_connect', as: :france_connect
+      get '/:path/:provider', action: 'openid_connect', as: :openid_connect, constraints: { :provider => /google|microsoft|yahoo|tatou/ }
     end
 
     resources :dossiers, only: [:index, :show, :new] do
@@ -269,6 +285,7 @@ Rails.application.routes.draw do
         post 'commentaire' => 'dossiers#create_commentaire'
         post 'ask_deletion'
         get 'attestation'
+        get 'qrcode/:created_at', action: 'qrcode', as: :qrcode
       end
 
       collection do

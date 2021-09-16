@@ -13,22 +13,27 @@
           %li
             = link_to "https://numerique.gouv.fr/", title: "DINUM", 'aria-label': 'DINUM' do
               %span.footer-logo.footer-logo-dinum{ role: 'img', 'aria-label': 'Logo DINUM' }
+            = link_to "http://www.net.pf/", title: "Net.pf", 'aria-label': 'net.pf' do
+              %span.footer-logo.footer-logo-netpf{ role: 'img', 'aria-label': 'Net.pf' }
+          %li
             = link_to "https://beta.gouv.fr", title: "le site de Beta.gouv.fr", 'aria-label': 'beta.gouv.fr' do
               %span.footer-logo.footer-logo-beta-gouv-fr{ role: 'img', 'aria-label': 'Logo beta.gouv.fr' }
             %span.footer-logo.footer-logo-france{ role: 'img', 'aria-label': 'République Française' }
 
       %li.footer-column
         %ul.footer-links
-          %li.footer-link
+          -# %li.footer-link
             = link_to "Newsletter", "https://my.sendinblue.com/users/subscribe/js_id/3s2q1/id/1", :title => "Notre newsletter", :class => "footer-link", :target => "_blank", rel: "noopener"
           %li.footer-link
             -# haml-lint:disable ApplicationNameLinter
-            = link_to "Nouveautés", "https://github.com/betagouv/demarches-simplifiees.fr/releases", :class => "footer-link", :title => "Nos nouveautés"
+            = link_to "Nouveautés", "https://github.com/maatinito/mes-demarches/releases", :class => "footer-link"
             -# haml-lint:enable ApplicationNameLinter
           %li.footer-link
             = link_to "Statistiques", stats_path, :class => "footer-link"
           %li.footer-link
             = link_to "CGU", CGU_URL, :class => "footer-link", :target => "_blank", rel: "noopener noreferrer"
+          %li.footer-link
+            = link_to "Données personnelles", RGPD_URL, :class => "footer-link", :target => "_blank", rel: "noopener noreferrer"
           %li.footer-link
             = link_to "Mentions légales", MENTIONS_LEGALES_URL, :class => "footer-link", :target => "_blank", rel: "noopener noreferrer"
           %li.footer-link

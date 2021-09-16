@@ -19,7 +19,10 @@
         = link_to 'Revenir en arrière', url_for(:back), class: "button", title: "Revenir sur le site de mon administration"
       - else
         - root_profile_link, root_profile_libelle = root_path_info_for_profile(nav_bar_profile)
-        = link_to root_profile_link, class: 'header-logo justify-center', title: root_profile_libelle do
+        = link_to root_profile_link, class: 'header-logo', title: root_profile_libelle  do
+          = image_tag 'header/logo-md-wide.svg', alt: '', class: 'site-title big'
+          = image_tag 'header/logo-md-narrow.svg', alt: '', class: 'site-title small'
+        -# = link_to root_profile_link, class: 'header-logo justify-center', title: root_profile_libelle do
           = image_tag HEADER_LOGO_SRC, alt: HEADER_LOGO_ALT, width: HEADER_LOGO_WIDTH, height: HEADER_LOGO_HEIGHT, loading: 'lazy'
           %span.big.site-title>
             = APPLICATION_NAME
@@ -60,7 +63,7 @@
 
       - elsif request.path != new_user_session_path
         - if request.path == new_user_registration_path
-          %li
+          %li.header-text
             Vous avez déjà un compte ?
         %li
           = link_to "Connexion", new_user_session_path, class: "button secondary"

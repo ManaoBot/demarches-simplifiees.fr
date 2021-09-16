@@ -1,6 +1,6 @@
 feature 'Signing up:' do
   let(:user_email) { generate :user_email }
-  let(:user_password) { 'my-s3cure-p4ssword' }
+  let(:user_password) { TEST_PASSWORD }
   let(:procedure) { create :simple_procedure, :with_service }
 
   scenario 'a new user can sign-up from scratch' do
@@ -14,12 +14,30 @@ feature 'Signing up:' do
     expect(page).to have_current_path dossiers_path
   end
 
+  context 'when the user register with a gmail.pf domain' do
+    let(:procedure) { create :simple_procedure, :with_service }
+
+    before do
+      visit commencer_path(path: procedure.path)
+      click_on "Créer un compte"
+      expect(page).to have_selector('.suspect-email', visible: false)
+      fill_in 'Email', with: 'bidou@gmail.pf'
+      fill_in 'Mot de passe', with: '12345'
+    end
+
+    scenario 'they can accept the suggestion', js: true do
+      expect(page).to have_selector('.suspect-email', visible: true)
+      click_on 'Oui'
+      expect(page).to have_field("Email", :with => 'bidou@gmail.com')
+    end
+  end
+
   context 'when the user makes a typo in their email address' do
     let(:procedure) { create :simple_procedure, :with_service }
 
     before do
       visit commencer_path(path: procedure.path)
-      click_on 'Créer un compte demarches-simplifiees.fr'
+      click_on "Créer un compte"
       expect(page).to have_selector('.suspect-email', visible: false)
       fill_in 'Email', with: 'bidou@yahoo.rf'
       fill_in 'Mot de passe', with: '12345'
@@ -49,7 +67,7 @@ feature 'Signing up:' do
 
   scenario 'a new user can’t sign-up with too short password when visiting a procedure' do
     visit commencer_path(path: procedure.path)
-    click_on 'Créer un compte demarches-simplifiees.fr'
+    click_on "Créer un compte"
 
     expect(page).to have_current_path new_user_registration_path
     sign_up_with user_email, '1234567'

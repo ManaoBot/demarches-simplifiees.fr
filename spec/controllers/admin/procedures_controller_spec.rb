@@ -1,6 +1,8 @@
 require 'uri'
 
 describe Admin::ProceduresController, type: :controller do
+  include ActiveJob::TestHelper
+
   let(:admin) { create(:administrateur) }
 
   let(:bad_procedure_id) { 100000 }
@@ -28,6 +30,13 @@ describe Admin::ProceduresController, type: :controller do
       duree_conservation_dossiers_hors_ds: duree_conservation_dossiers_hors_ds,
       monavis_embed: monavis_embed,
       lien_site_web: lien_site_web
+    }
+  }
+
+  let(:regulation_params) {
+    {
+      rgs_stamp: '1',
+      rgpd: '1'
     }
   }
 

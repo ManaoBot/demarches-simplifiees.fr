@@ -148,6 +148,49 @@ describe Users::DossiersController, type: :controller do
     end
   end
 
+  describe '#qrcode' do
+    let(:date) { Time.zone.now }
+    before {
+      Timecop.freeze(Time.zone.local(2018, 1, 2, 23, 11, 14))
+      sign_in(user)
+    }
+    after { Timecop.return }
+
+    context 'when the procedure has an attestation template' do
+      let(:another_user) { create(:user) }
+      let!(:dossier) { create(:dossier, :with_attestation, user: user) }
+
+      context 'when another user is connected' do
+        before { sign_in(another_user) }
+        after { sign_in(user) }
+
+        it 'shows attestation as HTML' do
+          get :qrcode, params: { id: dossier.id, created_at: dossier.encoded_date(:created_at) }
+          expect(response).to render_template(:qrcode)
+        end
+      end
+    end
+
+    context 'when the procedure no longer has an attestation template' do
+      let(:another_user) { create(:user) }
+      let!(:dossier) { create(:dossier, :with_attestation, user: user) }
+
+      context 'when another user is connected' do
+        before { sign_in(another_user) }
+        after { sign_in(user) }
+
+        it 'returns the attestation pdf' do
+          attestation_template = dossier.procedure.attestation_template
+          attestation_template.activated = false
+          attestation_template.save
+
+          get :qrcode, params: { id: dossier.id, created_at: dossier.encoded_date(:created_at) }
+          expect(response.headers["Location"]).to end_with ".pdf"
+        end
+      end
+    end
+  end
+
   describe 'update_identite' do
     let(:procedure) { create(:procedure, :for_individual) }
     let(:dossier) { create(:dossier, user: user, procedure: procedure) }
@@ -244,9 +287,9 @@ describe Users::DossiersController, type: :controller do
     end
 
     context 'with an invalid SIRET' do
-      let(:params_siret) { '000 000' }
+      let(:params_siret) { '000 000 000' }
 
-      it_behaves_like 'the request fails with an error', ['Siret Le numéro SIRET doit comporter 14 chiffres']
+      it_behaves_like 'the request fails with an error', ["Numéro TAHITI doit commencer par une lettre ou un chiffre, suivi de 5 chiffres"]
     end
 
     context 'with a valid SIRET' do

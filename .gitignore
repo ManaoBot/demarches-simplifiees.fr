@@ -28,14 +28,11 @@ yarn-debug.log*
 /.vscode
 /.idea
 /public/assets
-/public/packs
-/public/packs-test
-/node_modules
+/public/tmp/
 vendor/*
 /yarn-error.log
-yarn-debug.log*
-.yarn-integrity
 /docs
 
 # Local Netlify folder
 .netlify
+*.xcf

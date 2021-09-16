@@ -57,7 +57,7 @@ class ProcedureExportService
   end
 
   DEFAULT_STYLES = {
-    header_style: { background_color: "000000", color: "FFFFFF", font_size: 12, bold: true },
+    header_style: { background_color: "700000", color: "FFFFFF", font_size: 12, bold: true },
     row_style: { background_color: nil, color: "000000", font_size: 12 }
   }
 
@@ -71,12 +71,12 @@ class ProcedureExportService
       { instances: avis.to_a, sheet_name: 'Avis' }
     when Array
       { instances: table.last, sheet_name: table.first }
-    end.merge(DEFAULT_STYLES)
+    end.merge(DEFAULT_STYLES).merge(@procedure.column_styles(table))
 
     # transliterate: convert to ASCII characters
     # to ensure truncate respects 30 bytes
     # /\*?[] are invalid Excel worksheet characters
-    options[:sheet_name] = I18n.transliterate(options[:sheet_name], locale: :en)
+    options[:sheet_name] = I18n.transliterate(options[:sheet_name], replacement: '', locale: :en)
       .delete('/\*?[]')
       .truncate(30, omission: '')
 

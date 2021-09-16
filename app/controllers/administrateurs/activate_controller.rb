@@ -39,7 +39,7 @@ class Administrateurs::ActivateController < ApplicationController
   private
 
   def update_administrateur_params
-    params.require(:administrateur).permit(:reset_password_token, :password)
+    params.require(:administrateur).permit(:password, :reset_password_token)
   end
 
   def try_to_authenticate(klass, email, password)

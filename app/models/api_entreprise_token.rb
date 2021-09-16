@@ -14,7 +14,7 @@ class APIEntrepriseToken
   end
 
   def role?(role)
-    roles.include?(role)
+    roles.present? && roles.include?(role)
   end
 
   private

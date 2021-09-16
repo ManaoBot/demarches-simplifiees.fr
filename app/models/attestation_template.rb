@@ -41,14 +41,14 @@ class AttestationTemplate < ApplicationRecord
   def unspecified_champs_for_dossier(dossier)
     all_champs_with_libelle_index = (dossier.champs + dossier.champs_private)
       .reduce({}) do |acc, champ|
-        acc[champ.libelle] = champ
-        acc
-      end
+      acc[champ.libelle] = champ
+      acc
+    end
 
     used_tags.map do |used_tag|
       corresponding_champ = all_champs_with_libelle_index[used_tag]
 
-      if corresponding_champ && corresponding_champ.value.blank?
+      if corresponding_champ && corresponding_champ.value.blank? && corresponding_champ.champs.empty? && !corresponding_champ.piece_justificative_file.attached?
         corresponding_champ
       end
     end.compact
@@ -101,7 +101,8 @@ class AttestationTemplate < ApplicationRecord
       body: dossier ? replace_tags(body, dossier) : params.fetch(:body, body),
       footer: params.fetch(:footer, footer),
       logo: params.fetch(:logo, logo.attached? ? logo : nil),
-      signature: params.fetch(:signature, signature.attached? ? signature : nil)
+      signature: params.fetch(:signature, signature.attached? ? signature : nil),
+      qrcode: dossier ? qrcode_dossier_url(dossier, created_at: dossier.encoded_date(:created_at)) : nil
     }
   end
 

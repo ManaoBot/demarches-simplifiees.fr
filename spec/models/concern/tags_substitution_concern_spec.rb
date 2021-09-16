@@ -50,7 +50,7 @@ describe TagsSubstitutionConcern, type: :model do
       context 'and the template use the individual tags' do
         let(:template) { '--civilité-- --nom-- --prénom--' }
 
-        it { is_expected.to eq('Mme nom prenom') }
+        it { is_expected.to eq('Mme NOM Prenom') }
       end
     end
 
@@ -59,7 +59,7 @@ describe TagsSubstitutionConcern, type: :model do
 
       context 'and the template use the entreprise tags' do
         let(:template) do
-          '--SIREN-- --numéro de TVA intracommunautaire-- --SIRET du siège social-- --raison sociale-- --adresse--'
+          '--SIREN-- --numéro de TVA intracommunautaire-- --Numéro TAHITI du siège social-- --raison sociale-- --adresse--'
         end
         let(:etablissement) { create(:etablissement) }
 
@@ -182,7 +182,7 @@ describe TagsSubstitutionConcern, type: :model do
         pierre_champs.last.update(value: 'de La Morinerie')
       end
 
-      it { is_expected.to eq("Répétition\n\nNom : Paul\nPrénom : Chavard\n\nNom : Pierre\nPrénom : de La Morinerie") }
+      it { is_expected.to eq("<table><tr><th>Nom</th><th>Prénom</th></tr><tr><td>Paul</td><td>Chavard</td></tr><tr><td>Pierre</td><td>de La Morinerie</td></tr></table>") }
     end
 
     context 'when the procedure has a linked drop down menus type de champ' do

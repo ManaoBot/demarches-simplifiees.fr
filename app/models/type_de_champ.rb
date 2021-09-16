@@ -19,6 +19,7 @@
 class TypeDeChamp < ApplicationRecord
   enum type_champs: {
     text: 'text',
+    auto_completion: 'auto_completion',
     textarea: 'textarea',
     date: 'date',
     datetime: 'datetime',
@@ -35,6 +36,10 @@ class TypeDeChamp < ApplicationRecord
     multiple_drop_down_list: 'multiple_drop_down_list',
     linked_drop_down_list: 'linked_drop_down_list',
     pays: 'pays',
+    nationalites: 'nationalites',
+    commune_de_polynesie: 'commune_de_polynesie',
+    code_postal_de_polynesie: 'code_postal_de_polynesie',
+    numero_dn: 'numero_dn',
     regions: 'regions',
     departements: 'departements',
     communes: 'communes',
@@ -45,6 +50,7 @@ class TypeDeChamp < ApplicationRecord
     piece_justificative: 'piece_justificative',
     siret: 'siret',
     carte: 'carte',
+    te_fenua: 'te_fenua',
     repetition: 'repetition',
     titre_identite: 'titre_identite',
     iban: 'iban',
@@ -57,7 +63,7 @@ class TypeDeChamp < ApplicationRecord
   belongs_to :parent, class_name: 'TypeDeChamp', optional: true
   has_many :types_de_champ, -> { ordered }, foreign_key: :parent_id, class_name: 'TypeDeChamp', inverse_of: :parent, dependent: :destroy
 
-  store_accessor :options, :cadastres, :old_pj, :drop_down_options, :skip_pj_validation, :skip_content_type_pj_validation
+  store_accessor :options, :cadastres, :old_pj, :drop_down_options, :skip_pj_validation, :skip_content_type_pj_validation, :parcelles, :batiments, :zones_manuelles, :min, :max, :level
   has_many :revision_types_de_champ, class_name: 'ProcedureRevisionTypeDeChamp', dependent: :destroy, inverse_of: :type_de_champ
   has_many :revisions, through: :revision_types_de_champ
 
@@ -198,6 +204,14 @@ class TypeDeChamp < ApplicationRecord
     type_champ == TypeDeChamp.type_champs.fetch(:number)
   end
 
+  def date?
+    type_champ == TypeDeChamp.type_champs.fetch(:date)
+  end
+
+  def datetime?
+    type_champ == TypeDeChamp.type_champs.fetch(:datetime)
+  end
+
   def titre_identite?
     type_champ == TypeDeChamp.type_champs.fetch(:titre_identite)
   end
@@ -306,6 +320,14 @@ class TypeDeChamp < ApplicationRecord
       :updated_at
     ],
     methods: [
+      # polynesian methods
+      :zones_manuelles,
+      :parcelles,
+      :batiments,
+      :min,
+      :max,
+      :level,
+      # base methods
       :drop_down_list_value,
       :piece_justificative_template_filename,
       :piece_justificative_template_url,

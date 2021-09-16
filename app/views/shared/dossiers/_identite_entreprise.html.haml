@@ -8,13 +8,16 @@
         %th.libelle Dénomination :
         %td= raison_sociale_or_name(etablissement)
       %tr
-        %th.libelle SIRET :
+        %th.libelle Numéro TAHITI :
         %td= etablissement.siret
 
       - if etablissement.siret != etablissement.entreprise.siret_siege_social
         %tr
-          %th.libelle SIRET du siège social:
+          %th.libelle Numéro TAHITI du siège social:
           %td= etablissement.entreprise.siret_siege_social
+      %tr
+        %th.libelle Nom commercial :
+        %td= sanitize(etablissement.entreprise_nom_commercial)
       %tr
         %th.libelle Forme juridique :
         %td= sanitize(etablissement.entreprise.forme_juridique)
@@ -145,6 +148,6 @@
           %td= try_format_date(etablissement.association_date_declaration)
 
 %p
-  = link_to "➡ Autres informations sur l’organisme sur « annuaire-entreprises.data.gouv.fr » (ex: fiche d'immatriculation RNCS)",
-  "https://annuaire-entreprises.data.gouv.fr/entreprise/#{etablissement.siren}",
+  = link_to '➡ Autres informations sur le site de l\'ISPF',
+  "http://www.ispf.pf/bases/Repertoires/Entreprises/Detail.aspx?numtah=#{etablissement.siren}",
   target: "_blank"

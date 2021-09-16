@@ -40,7 +40,7 @@ feature 'As an administrateur I wanna create a new procedure', js: true do
         fill_in 'procedure_duree_conservation_dossiers_dans_ds', with: '3'
         click_on 'Créer la démarche'
 
-        expect(page).to have_text('Libelle doit être rempli')
+        expect(page).to have_text('Toutes les cases concernant le RGPD et le RGS doivent être cochées')
         fill_in_dummy_procedure_details
         click_on 'Créer la démarche'
 
@@ -100,7 +100,7 @@ feature 'As an administrateur I wanna create a new procedure', js: true do
       expect(page).to have_link(nil, href: /#{commencer_test_path(Procedure.last.path)}/)
 
       expect(page).to have_selector('#procedure_path', visible: true)
-      expect(find_field('procedure_path').value).to eq 'libelle-de-la-procedure'
+      expect(find_field('procedure_path').value).to eq 'service-libelle-de-la-procedure'
       fill_in 'lien_site_web', with: 'http://some.website'
       click_on 'publish'
 

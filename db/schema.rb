@@ -249,9 +249,9 @@ ActiveRecord::Schema.define(version: 2021_02_04_180955) do
     t.datetime "last_champ_private_updated_at"
     t.datetime "last_avis_updated_at"
     t.datetime "last_commentaire_updated_at"
+    t.string "api_entreprise_job_exceptions", array: true
     t.index "to_tsvector('french'::regconfig, (search_terms || private_search_terms))", name: "index_dossiers_on_search_terms_private_search_terms", using: :gin
     t.index "to_tsvector('french'::regconfig, search_terms)", name: "index_dossiers_on_search_terms", using: :gin
-    t.string "api_entreprise_job_exceptions", array: true
     t.index ["archived"], name: "index_dossiers_on_archived"
     t.index ["groupe_instructeur_id"], name: "index_dossiers_on_groupe_instructeur_id"
     t.index ["hidden_at"], name: "index_dossiers_on_hidden_at"
@@ -537,10 +537,10 @@ ActiveRecord::Schema.define(version: 2021_02_04_180955) do
     t.string "path", null: false
     t.string "declarative_with_state"
     t.text "monavis_embed"
-    t.text "routing_criteria_name", default: "Votre ville"
     t.boolean "csv_export_queued"
     t.boolean "xlsx_export_queued"
     t.boolean "ods_export_queued"
+    t.text "routing_criteria_name", default: "Votre ville"
     t.datetime "closed_at"
     t.datetime "unpublished_at"
     t.bigint "canonical_procedure_id"
@@ -573,6 +573,16 @@ ActiveRecord::Schema.define(version: 2021_02_04_180955) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["procedure_id"], name: "index_refused_mails_on_procedure_id"
+  end
+
+  create_table "s3_synchronizations", force: :cascade do |t|
+    t.string "target"
+    t.bigint "active_storage_blob_id"
+    t.boolean "checked"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["active_storage_blob_id"], name: "index_s3_synchronizations_on_active_storage_blob_id"
+    t.index ["target", "active_storage_blob_id"], name: "index_s3_synchronizations_on_target_and_active_storage_blob_id", unique: true
   end
 
   create_table "services", force: :cascade do |t|
@@ -750,7 +760,7 @@ ActiveRecord::Schema.define(version: 2021_02_04_180955) do
   add_foreign_key "procedure_revisions", "procedures"
   add_foreign_key "procedures", "procedure_revisions", column: "draft_revision_id"
   add_foreign_key "procedures", "procedure_revisions", column: "published_revision_id"
-  add_foreign_key "procedures", "services"
+  add_foreign_key "procedures", "services", name: "fk_procedures_services"
   add_foreign_key "received_mails", "procedures"
   add_foreign_key "refused_mails", "procedures"
   add_foreign_key "services", "administrateurs"

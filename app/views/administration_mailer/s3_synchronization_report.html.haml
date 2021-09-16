@@ -1,0 +1,8 @@
+- content_for(:title, "Statistiques d'envoi des pièces jointes")
+
+%p
+  statistiques d'envoi des fichiers
+= render partial: "stat_table", locals: { stats: @uploaded_stats }
+%p
+  statistiques de vérification des fichiers transférés
+= render partial: "stat_table", locals: { stats: @checked_stats }

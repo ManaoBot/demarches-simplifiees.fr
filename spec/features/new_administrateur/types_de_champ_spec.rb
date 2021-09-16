@@ -118,7 +118,7 @@ feature 'As an administrateur I can edit types de champ', js: true do
   it "Add carte champ" do
     add_champ
 
-    select('Carte', from: 'champ-0-type_champ')
+    select('Carte de France', from: 'champ-0-type_champ')
     fill_in 'champ-0-libelle', with: 'Libellé de champ carte', fill_options: { clear: :backspace }
     check 'Cadastres'
 
@@ -129,6 +129,24 @@ feature 'As an administrateur I can edit types de champ', js: true do
     within_window(preview_window) do
       expect(page).to have_content('Libellé de champ carte')
       expect(page).to have_content('Parcelles cadastrales')
+    end
+  end
+
+  it "Add te_fenua champ" do
+    add_champ
+
+    select('Carte de Polynésie', from: 'champ-0-type_champ')
+    fill_in 'champ-0-libelle', with: 'Libellé de champ Te Fenua', fill_options: { clear: :backspace }
+    check 'Batiments'
+    check 'Parcelles du cadastre'
+    check 'Zones manuelles'
+
+    wait_until { procedure.types_de_champ.first.batiments == true }
+    expect(page).to have_content('Formulaire enregistré')
+
+    preview_window = window_opened_by { click_on 'Prévisualiser le formulaire' }
+    within_window(preview_window) do
+      expect(page).to have_content('Libellé de champ Te Fenua')
     end
   end
 

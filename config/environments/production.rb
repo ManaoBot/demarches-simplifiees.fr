@@ -87,8 +87,15 @@ Rails.application.configure do
       port: '587',
       authentication: :cram_md5
     }
+  elsif ENV.fetch('MAILJET_API_KEY', '').present?
+    config.action_mailer.delivery_method = :mailjet_api
   else
-    config.action_mailer.delivery_method = :mailjet
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: ENV.fetch("DB_HOST", "localhost"),
+      port: '25',
+      openssl_verify_mode: 'none'
+    }
   end
 
   # Configure default root URL for generating URLs to routes
@@ -103,7 +110,7 @@ Rails.application.configure do
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
 
-  config.active_storage.service = :openstack
+  config.active_storage.service = ENV.fetch("STORAGE", 'local').to_sym
 
   # Send deprecation notices to registered listeners.
   config.active_support.deprecation = :notify

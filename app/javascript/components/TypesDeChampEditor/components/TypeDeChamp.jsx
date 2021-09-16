@@ -10,20 +10,32 @@ import MandatoryInput from './MandatoryInput';
 import MoveButton from './MoveButton';
 import TypeDeChampCarteOption from './TypeDeChampCarteOption';
 import TypeDeChampCarteOptions from './TypeDeChampCarteOptions';
+import TypeDeChampTeFenuaOption from './TypeDeChampTeFenuaOption';
+import TypeDeChampTeFenuaOptions from './TypeDeChampTeFenuaOptions';
+import TypeDeChampIntegerOption from './TypeDeChampIntegerOption';
+import TypeDeChampIntegerOptions from './TypeDeChampIntegerOptions';
+import TypeDeChampLevelOption from './TypeDeChampLevelOption';
+import TypeDeChampDateOption from './TypeDeChampDateOption';
+import TypeDeChampDateOptions from './TypeDeChampDateOptions';
 import TypeDeChampDropDownOptions from './TypeDeChampDropDownOptions';
 import TypeDeChampPieceJustificative from './TypeDeChampPieceJustificative';
 import TypeDeChampRepetitionOptions from './TypeDeChampRepetitionOptions';
 import TypeDeChampTypesSelect from './TypeDeChampTypesSelect';
+import TypeDeChampHeaderSectionOptions from './TypeDeChampHeaderSectionOptions';
 
 const TypeDeChamp = sortableElement(
   ({ typeDeChamp, dispatch, idx: index, isFirstItem, isLastItem, state }) => {
     const isDropDown = [
+      'auto_completion',
       'drop_down_list',
       'multiple_drop_down_list',
       'linked_drop_down_list'
     ].includes(typeDeChamp.type_champ);
     const isFile = typeDeChamp.type_champ === 'piece_justificative';
     const isCarte = typeDeChamp.type_champ === 'carte';
+    const isTeFenua = typeDeChamp.type_champ === 'te_fenua';
+    const isInteger = typeDeChamp.type_champ === 'integer_number';
+    const isDate = typeDeChamp.type_champ === 'date';
     const isExplication = typeDeChamp.type_champ === 'explication';
     const isHeaderSection = typeDeChamp.type_champ === 'header_section';
     const isTitreIdentite = typeDeChamp.type_champ === 'titre_identite';
@@ -83,7 +95,15 @@ const TypeDeChamp = sortableElement(
         </div>
         <div
           className={`flex justify-start section ${
-            isDropDown || isFile || isCarte ? 'hr' : ''
+            isDropDown ||
+            isFile ||
+            isCarte ||
+            isTeFenua ||
+            isInteger ||
+            isDate ||
+            isHeaderSection
+              ? 'hr'
+              : ''
           }`}
         >
           <div className="flex column justify-start">
@@ -145,6 +165,44 @@ const TypeDeChamp = sortableElement(
               />
             ))}
           </TypeDeChampCarteOptions>
+          <TypeDeChampTeFenuaOptions isVisible={isTeFenua}>
+            <TypeDeChampTeFenuaOption
+              label="Parcelles du cadastre"
+              handler={updateHandlers.parcelles}
+            />
+            <TypeDeChampTeFenuaOption
+              label="Batiments"
+              handler={updateHandlers.batiments}
+            />
+            <TypeDeChampTeFenuaOption
+              label="Zones manuelles"
+              handler={updateHandlers.zones_manuelles}
+            />
+          </TypeDeChampTeFenuaOptions>
+          <TypeDeChampIntegerOptions isVisible={isInteger}>
+            <TypeDeChampIntegerOption
+              label="Minimum"
+              handler={updateHandlers.min}
+            />
+            <TypeDeChampIntegerOption
+              label="Maximum"
+              handler={updateHandlers.max}
+            />
+          </TypeDeChampIntegerOptions>
+          <TypeDeChampHeaderSectionOptions isVisible={isHeaderSection}>
+            <TypeDeChampLevelOption
+              label="Niveau"
+              handler={updateHandlers.level}
+            />
+            <TypeDeChampLevelOption
+              label="Niveau2"
+              handler={updateHandlers.level}
+            />
+          </TypeDeChampHeaderSectionOptions>
+          <TypeDeChampDateOptions isVisible={isDate}>
+            <TypeDeChampDateOption label="Début" handler={updateHandlers.min} />
+            <TypeDeChampDateOption label="Fin" handler={updateHandlers.max} />
+          </TypeDeChampDateOptions>
           <TypeDeChampRepetitionOptions
             isVisible={isRepetition}
             state={{
@@ -231,13 +289,19 @@ const OPTIONS_FIELDS = {
 };
 
 export const FIELDS = [
+  'batiments',
   'description',
   'drop_down_list_value',
+  'level',
   'libelle',
   'mandatory',
+  'parcelles',
   'parent_id',
   'piece_justificative_template',
   'private',
+  'zones_manuelles',
+  'min',
+  'max',
   'type_champ',
   ...Object.keys(OPTIONS_FIELDS)
 ];

@@ -29,7 +29,7 @@ class Champs::DropDownListChamp < Champ
   end
 
   def options
-    drop_down_list_options
+    drop_down_list_options.filter { |option| option.casecmp('autre') != 0 } | [value]
   end
 
   def disabled_options
@@ -38,5 +38,9 @@ class Champs::DropDownListChamp < Champ
 
   def enabled_non_empty_options
     drop_down_list_enabled_non_empty_options
+  end
+
+  def allows_other_value?
+    drop_down_list_options.find { |option| option.casecmp('autre') == 0 }
   end
 end

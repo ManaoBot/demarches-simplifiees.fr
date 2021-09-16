@@ -50,6 +50,7 @@ class API::V2::Schema < GraphQL::Schema
     Types::Champs::IntegerNumberChampType,
     Types::Champs::LinkedDropDownListChampType,
     Types::Champs::MultipleDropDownListChampType,
+    Types::Champs::NumeroDnChampType,
     Types::Champs::PieceJustificativeChampType,
     Types::Champs::RepetitionChampType,
     Types::Champs::SiretChampType,
@@ -67,7 +68,7 @@ class API::V2::Schema < GraphQL::Schema
 
   use GraphQL::Execution::Interpreter
   use GraphQL::Analysis::AST
-  use GraphQL::Schema::Timeout, max_seconds: 10
+  use GraphQL::Schema::Timeout, max_seconds: 15
   use GraphQL::Batch
   use GraphQL::Backtrace
 

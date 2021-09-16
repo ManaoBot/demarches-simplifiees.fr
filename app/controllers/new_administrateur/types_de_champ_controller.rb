@@ -56,6 +56,14 @@ module NewAdministrateur
             :updated_at
           ],
           methods: [
+            # polynesian fields
+            :batiments,
+            :level,
+            :parcelles,
+            :min,
+            :max,
+            :zones_manuelles,
+            # base fields
             :drop_down_list_value,
             :piece_justificative_template_filename,
             :piece_justificative_template_url,
@@ -67,6 +75,14 @@ module NewAdministrateur
 
     def type_de_champ_create_params
       params.required(:type_de_champ).permit(:type_champ,
+        # polynesian
+        :batiments,
+        :level,
+        :parcelles,
+        :zones_manuelles,
+        :min,
+        :max,
+        # base
         :libelle,
         :description,
         :mandatory,
@@ -90,6 +106,15 @@ module NewAdministrateur
 
     def type_de_champ_update_params
       params.required(:type_de_champ).permit(:type_champ,
+        # polynesian
+        :cadastres,
+        :level,
+        :parcelles,
+        :batiments,
+        :zones_manuelles,
+        :min,
+        :max,
+        # base
         :libelle,
         :description,
         :mandatory,

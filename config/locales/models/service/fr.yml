@@ -7,3 +7,15 @@ fr:
     operateur_d_etat: "Opérateur d’État"
     service_deconcentre_de_l_etat: "Service déconcentré de l’État"
     autre: 'Autre'
+  activerecord:
+    attributes:
+      service:
+        siret: "Numéro TAHITI"
+    errors:
+      models:
+        service:
+          attributes:
+            siret:
+              format: 'doit commencer par une lettre ou un chiffre, suivi de 5 chiffres'
+              invalid: 'ne correspond pas à un établissement existant'
+              checksum: 'comporte une erreur, vérifiez les chiffres composant le numéro'

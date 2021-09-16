@@ -566,7 +566,7 @@ describe Procedure do
         expect(procedure.published_revision).not_to be_nil
         expect(procedure.draft_revision).not_to be_nil
         expect(procedure.revisions.count).to eq(2)
-        expect(procedure.revisions).to eq([procedure.published_revision, procedure.draft_revision])
+        expect(procedure.revisions.sort_by(&:id)).to eq([procedure.published_revision, procedure.draft_revision])
       end
     end
 
@@ -623,7 +623,7 @@ describe Procedure do
         expect(procedure.published_revision).not_to be_nil
         expect(procedure.draft_revision).not_to be_nil
         expect(procedure.revisions.count).to eq(2)
-        expect(procedure.revisions).to eq([procedure.published_revision, procedure.draft_revision])
+        expect(procedure.revisions.sort_by(&:id)).to eq([procedure.published_revision, procedure.draft_revision])
       end
     end
 
@@ -676,7 +676,7 @@ describe Procedure do
       expect(procedure.published_revision).not_to be_nil
       expect(procedure.draft_revision).not_to be_nil
       expect(procedure.revisions.count).to eq(2)
-      expect(procedure.revisions).to eq([procedure.published_revision, procedure.draft_revision])
+      expect(procedure.revisions.sort_by(&:id)).to eq([procedure.published_revision, procedure.draft_revision])
     end
   end
 
@@ -757,7 +757,7 @@ describe Procedure do
       expect(procedure.published_revision).not_to be_nil
       expect(procedure.draft_revision).not_to be_nil
       expect(procedure.revisions.count).to eq(2)
-      expect(procedure.revisions).to eq([procedure.published_revision, procedure.draft_revision])
+      expect(procedure.revisions.sort_by(&:id)).to eq([procedure.published_revision, procedure.draft_revision])
     end
   end
 
@@ -829,6 +829,13 @@ describe Procedure do
       end
 
       it { is_expected.to eq 'inscription-au-college' }
+    end
+
+    context 'when a service is given' do
+      let!(:service) { create :service, nom: "Direction Générale de l'éducation et de l'enseignement" }
+      let(:procedure) { create :procedure, aasm_state: :publiee, libelle: 'Inscription au Collège', service: service }
+
+      it { is_expected.to eq 'dgee-inscription-au-college' }
     end
   end
 

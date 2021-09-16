@@ -1,0 +1,80 @@
+.ol-control-add {
+  left: 0.5em;
+  top: 5em;
+
+  button {
+    background-image: image-url("icons/polygon.svg");
+  }
+}
+
+.ol-control-delete {
+  left: 0.5em;
+  top: 7em;
+
+  button {
+    background-image: image-url("icons/trash-white.svg");
+  }
+}
+
+.te-fenua {
+  position: relative;
+}
+
+.te-fenua-header {
+  text-align: center;
+}
+
+.place {
+  background-color: rgba(0, 60, 136, 0.7);
+  border-radius: 5px;
+  left: 4em;
+  padding: 2px 2px 2px 2px;
+  position: absolute;
+  right: 4em;
+  top: 0.4em;
+  z-index: 20;
+
+}
+
+.te-fenua-help {
+  background-color: rgba(0, 60, 136, 0.7);
+  border-radius: 5px;
+  bottom: 0.4em;
+  color: #FFFFFF;
+  padding: 4px 4px 1px;
+  position: absolute;
+  right: 0.4em;
+  z-index: 20;
+
+  img {
+    border-radius: 5px;
+  }
+
+
+  &.add-zone {
+    bottom: 2.5em;
+    left: 0.4em;
+    right: auto;
+  }
+
+  &.add {
+    bottom: auto;
+    left: 2.8em;
+    right: auto;
+    top: 5em;
+
+    &::after {
+      border: 0.357em solid transparent;
+      border-left: none;
+      border-right-color: rgba(0, 60, 136, 0.7);
+      content: "";
+      height: 0;
+      left: 0;
+      margin-left: -0.357em;
+      margin-top: -0.357em;
+      position: absolute;
+      top: 50%;
+      width: 0;
+    }
+  }
+}

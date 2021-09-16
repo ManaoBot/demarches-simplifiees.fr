@@ -26,13 +26,15 @@ end
 # A list of features to be deployed on first push
 features = [
   :administrateur_web_hook,
+  :down_time,
   :insee_api_v3,
   :instructeur_bypass_email_login_token,
   :maintenance_mode,
   :mini_profiler,
   :xray,
   :carte_ign,
-  :localization
+  :localization,
+  :new_look_banner
 ]
 
 def database_exists?

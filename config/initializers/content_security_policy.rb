@@ -1,10 +1,10 @@
 # rubocop:disable DS/ApplicationName
 Rails.application.config.content_security_policy do |policy|
   # Whitelist image
-  policy.img_src :self, "*.openstreetmap.org", "static.demarches-simplifiees.fr", "*.cloud.ovh.net", "stats.data.gouv.fr", "*", :data, :blob
+  policy.img_src :self, "*.openstreetmap.org", "static.#{FR_SITE}", "*.cloud.ovh.net", "*", :data, :blob
   # Whitelist JS: nous, sendinblue et matomo
   # miniprofiler et nous avons quelques boutons inline :(
-  policy.script_src :self, "stats.data.gouv.fr", "*.sendinblue.com", "*.crisp.chat", "crisp.chat", "*.sibautomation.com", "sibautomation.com", 'cdn.jsdelivr.net', 'maxcdn.bootstrapcdn.com', 'code.jquery.com', :unsafe_eval, :unsafe_inline, :blob
+  policy.script_src :self, "stats.data.gouv.fr", "*.sendinblue.com", "*.crisp.chat", "crisp.chat", "beta.mes-demarches.gov.pf", "*.sibautomation.com", "sibautomation.com", 'cdn.jsdelivr.net', 'maxcdn.bootstrapcdn.com', 'code.jquery.com', :unsafe_eval, :unsafe_inline, :blob
   # Pour les CSS, on a beaucoup de style inline et quelques balises <style>
   # c'est trop compliqué pour être rectifié immédiatement (et sans valeur ajoutée:
   # c'est hardcodé dans les vues, donc pas injectable).
@@ -16,9 +16,13 @@ Rails.application.config.content_security_policy do |policy|
   if Rails.env.development?
     # Les CSP ne sont pas appliquées en dev: on notifie cependant une url quelconque de la violation
     # pour détecter les erreurs lors de l'ajout d'une nouvelle brique externe durant le développement
-    policy.report_uri "http://#{ENV['APP_HOST']}/csp/"
+    # policy.report_uri "http://#{ENV['APP_HOST']}/csp/"
     # En développement, quand bin/webpack-dev-server est utilisé, on autorise les requêtes faites par le live-reload
     policy.connect_src(*policy.connect_src, "ws://localhost:3035", "http://localhost:3035")
   end
+  # polynesian configurations
+  policy.img_src(*policy.img_src, "beta.mes-demarches.gov.pf")
+  policy.connect_src(*policy.connect_src, "www.tefenua.gov.pf", "oos.eu-west-2.outscale.com")
+  policy.default_src(*policy.default_src, "oos.eu-west-2.outscale.com")
 end
 # rubocop:enable DS/ApplicationName

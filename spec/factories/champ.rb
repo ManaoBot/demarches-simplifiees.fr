@@ -20,6 +20,11 @@ FactoryBot.define do
       value { 'text' }
     end
 
+    factory :champ_auto_completion, class: 'Champs::AutoCompletionChamp' do
+      type_de_champ { association :type_de_champ_auto_completion, procedure: dossier.procedure }
+      value { '' }
+    end
+
     factory :champ_textarea, class: 'Champs::TextareaChamp' do
       type_de_champ { association :type_de_champ_textarea, procedure: dossier.procedure }
       value { 'textarea' }
@@ -85,6 +90,26 @@ FactoryBot.define do
       value { 'choix 1' }
     end
 
+    factory :champ_nationalites, class: 'Champs::NationaliteChamp' do
+      type_de_champ { association :type_de_champ_nationalites, procedure: dossier.procedure }
+      value { 'Française' }
+    end
+
+    factory :champ_commune_de_polynesie, class: 'Champs::CommuneDePolynesieChamp' do
+      type_de_champ { association :type_de_champ_commune_de_polynesie, procedure: dossier.procedure }
+      value { 'Arue - Tahiti - 98701' }
+    end
+
+    factory :champ_code_postal_de_polynesie, class: 'Champs::CodePostalDePolynesieChamp' do
+      type_de_champ { association :type_de_champ_code_postal_de_polynesie, procedure: dossier.procedure }
+      value { '98701 - Arue - Tahiti' }
+    end
+
+    factory :champ_numero_dn, class: 'Champs::NumeroDnChamp' do
+      type_de_champ { association :type_de_champ_numero_dn, procedure: dossier.procedure }
+      value { '["1234567", null]' }
+    end
+
     factory :champ_multiple_drop_down_list, class: 'Champs::MultipleDropDownListChamp' do
       type_de_champ { association :type_de_champ_multiple_drop_down_list, procedure: dossier.procedure }
       value { '["choix 1", "choix 2"]' }
@@ -143,6 +168,10 @@ FactoryBot.define do
       end
     end
 
+    factory :champ_piece_justificative_empty, class: 'Champs::PieceJustificativeChamp' do
+      type_de_champ { association :type_de_champ_piece_justificative, procedure: dossier.procedure }
+    end
+
     factory :champ_titre_identite, class: 'Champs::TitreIdentiteChamp' do
       type_de_champ { association :type_de_champ_titre_identite, procedure: dossier.procedure }
 
@@ -153,6 +182,10 @@ FactoryBot.define do
 
     factory :champ_carte, class: 'Champs::CarteChamp' do
       type_de_champ { association :type_de_champ_carte, procedure: dossier.procedure }
+    end
+
+    factory :champ_te_fenua, class: 'Champs::TeFenuaChamp' do
+      type_de_champ { association :type_de_champ_te_fenua, procedure: dossier.procedure }
     end
 
     factory :champ_iban, class: 'Champs::IbanChamp' do

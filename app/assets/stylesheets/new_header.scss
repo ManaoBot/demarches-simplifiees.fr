@@ -9,7 +9,7 @@ $header-mobile-breakpoint: 550px;
 
 // FIXME: Rename when the header is generalized
 .new-header {
-  background-color: #FFFFFF;
+  background-color: $red;
 }
 
 .new-header-with-border {
@@ -29,7 +29,7 @@ $header-mobile-breakpoint: 550px;
   align-items: center;
 
   img {
-    margin-right: 10px;
+    margin-right: 0px;
   }
 
   .site-title {
@@ -37,12 +37,16 @@ $header-mobile-breakpoint: 550px;
     font-weight: bold;
 
     &.small {
+      width: 32px;
+
       @media (min-width: $header-mobile-breakpoint) {
         display: none;
       }
     }
 
     &.big {
+      width: 360px;
+
       @media (max-width: $header-mobile-breakpoint) {
         display: none;
       }
@@ -61,12 +65,15 @@ $header-mobile-breakpoint: 550px;
     height: 72px;
     line-height: 72px;
     font-size: 18px;
-    color: $black;
+    color: $nav-bar-fg;
 
-    &.active,
+    &.active {
+      border-bottom: 2px solid $nav-bar-fg;
+    }
+
     &:hover {
-      color: $blue;
-      border-bottom: 2px solid $blue;
+      color: $nav-bar-link;
+      border-bottom: 2px solid $nav-bar-link;
 
       &.contact-link {
         position: relative;
@@ -92,7 +99,7 @@ $header-mobile-breakpoint: 550px;
   color: $black;
   z-index: 100;
   font-size: initial;
-  line-height: 1.6;
+  line-height: 10.6;
 
   &::after,
   &::before {
@@ -240,3 +247,9 @@ $header-mobile-breakpoint: 550px;
     }
   }
 }
+
+.header-text {
+  color: $nav-bar-fg;
+  background: $nav-bar-bg;
+}
+
